@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weekly Presentation Trainer</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;1,400&family=DM+Mono&display=swap');
+
+  /* =====================
+     CONFIG NOTICE:
+     Search for "YOUR_" to find all places you need to fill in your keys.
+     ===================== */
+
+  :root {
+    --purple: #7F77DD;
+    --purple-dark: #534AB7;
+    --purple-deeper: #3C3489;
+    --purple-light: #EEEDFE;
+    --purple-mid: #CECBF6;
+    --purple-border: #AFA9EC;
+    --bg: #F5F4F0;
+    --card: #FFFFFF;
+    --text: #1A1A1A;
+    --text-2: #555;
+    --text-3: #999;
+    --border: #1A1A1A;
+    --border-light: #D5D3DC;
+    --radius: 10px;
+    --warn: #BA7517;
+    --danger: #C0392B;
+    --danger-bg: #FEF0EE;
+    --success: #1A7A4A;
+    --success-bg: #EDFAF3;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── Layout ── */
+  .page { max-width: 680px; margin: 0 auto; padding: 2rem 1.25rem 5rem; }
+
+  /* ── Header ── */
+  .header { margin-bottom: 2rem; }
+  .week-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 12px; font-weight: 500;
+    color: var(--purple-deeper); background: var(--purple-light);
+    border: 1.5px solid var(--purple-border);
+    border-radius: 20px; padding: 3px 12px; margin-bottom: 12px;
+  }
+  .header h1 { font-size: 22px; font-weight: 500; letter-spacing: -0.4px; }
+  .header p { font-size: 13px; color: var(--text-2); margin-top: 5px; }
+
+  /* ── Settings bar ── */
+  .settings-bar {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 1.5rem; flex-wrap: wrap;
+  }
+  .settings-bar span { font-size: 12px; color: var(--text-3); }
+  .key-status {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 12px; padding: 4px 10px;
+    border-radius: 20px; border: 1px solid;
+  }
+  .key-status.ok { color: var(--success); background: var(--success-bg); border-color: #9FE1CB; }
+  .key-status.ng { color: var(--danger); background: var(--danger-bg); border-color: #F5C6C4; }
+  .btn-settings {
+    font-size: 12px; padding: 5px 12px;
+    border: 1.5px solid var(--border); border-radius: 8px;
+    background: var(--card); color: var(--text-2); cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .btn-settings:hover { background: var(--bg); }
+
+  /* ── Modal ── */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.45);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 100; padding: 1rem;
+  }
+  .modal {
+    background: var(--card); border: 2px solid var(--border);
+    border-radius: 14px; padding: 1.75rem;
+    width: 100%; max-width: 480px;
+  }
+  .modal h2 { font-size: 17px; font-weight: 500; margin-bottom: 4px; }
+  .modal p { font-size: 12px; color: var(--text-2); margin-bottom: 1.25rem; line-height: 1.6; }
+  .modal-field { margin-bottom: 1rem; }
+  .modal-label { font-size: 11px; font-weight: 500; letter-spacing: 0.07em; text-transform: uppercase; color: var(--text-3); margin-bottom: 6px; display: block; }
+  .modal-input {
+    width: 100%; font-family: 'DM Mono', monospace; font-size: 12px;
+    padding: 9px 12px; border: 2px solid var(--border); border-radius: 8px;
+    background: #FAFAF9; color: var(--text);
+  }
+  .modal-input:focus { outline: none; border-color: var(--purple); box-shadow: 0 0 0 3px var(--purple-light); }
+  .modal-row { display: flex; gap: 8px; justify-content: flex-end; margin-top: 1.25rem; }
+
+  /* ── Step ── */
+  .step-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .step-num {
+    width: 24px; height: 24px; border-radius: 50%;
+    background: var(--purple); color: #fff;
+    font-size: 12px; font-weight: 500;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .step-label { font-size: 13px; font-weight: 500; }
+
+  /* ── Card ── */
+  .card {
+    background: var(--card); border: 1.5px solid var(--border);
+    border-radius: var(--radius); padding: 1.25rem; margin-bottom: 1.5rem;
+  }
+  .card-head {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+  .card-title { font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 7px; }
+
+  /* ── Tags ── */
+  .tag {
+    font-size: 12px; font-weight: 500;
+    background: var(--purple-light); border: 1px solid var(--purple-border);
+    color: var(--purple-deeper); border-radius: 20px; padding: 2px 10px; white-space: nowrap;
+  }
+
+  /* ── Field ── */
+  .field-label {
+    font-size: 11px; font-weight: 500; letter-spacing: 0.07em;
+    text-transform: uppercase; color: var(--text-3); margin-bottom: 6px;
+  }
+  .hint {
+    background: var(--bg); border: 1px solid var(--border-light);
+    border-radius: 8px; padding: 10px 14px;
+    font-size: 12px; color: var(--text-2); line-height: 1.7; margin-bottom: 12px;
+  }
+
+  /* ── Textarea ── */
+  textarea {
+    width: 100%; font-family: 'DM Sans', sans-serif;
+    font-size: 14px; line-height: 1.8; color: var(--text);
+    background: #FAFAF9; border: 2px solid var(--border);
+    border-radius: 8px; padding: 12px 14px; resize: vertical;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  textarea:focus { outline: none; border-color: var(--purple); box-shadow: 0 0 0 3px var(--purple-light); }
+  textarea::placeholder { color: var(--text-3); }
+  #script-input { min-height: 180px; }
+
+  .word-counter { font-size: 12px; color: var(--text-3); text-align: right; margin-top: 5px; }
+  .word-counter.warn { color: var(--warn); }
+  .divider { height: 1px; background: var(--border-light); margin: 1rem 0; }
+
+  /* ── Buttons ── */
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    border-radius: 8px; font-size: 13px; font-weight: 500;
+    cursor: pointer; font-family: 'DM Sans', sans-serif;
+    transition: all 0.15s;
+  }
+  .btn-outline {
+    padding: 6px 14px; background: transparent;
+    border: 1.5px solid var(--border); color: var(--text-2);
+  }
+  .btn-outline:hover { background: var(--bg); }
+  .btn-primary {
+    padding: 9px 22px; background: var(--purple);
+    border: none; color: #fff;
+  }
+  .btn-primary:hover { background: var(--purple-dark); }
+  .btn-primary:disabled { background: var(--border-light); cursor: not-allowed; }
+  .btn-play {
+    padding: 8px 18px; background: var(--purple-light);
+    border: 1.5px solid var(--purple-border); color: var(--purple-deeper); white-space: nowrap;
+  }
+  .btn-play:hover { background: var(--purple-mid); }
+  .btn-nav {
+    padding: 9px 20px; background: var(--card);
+    border: 1.5px solid var(--border); color: var(--text);
+  }
+  .btn-nav:hover { background: var(--bg); }
+  .btn-sm {
+    padding: 4px 10px; font-size: 12px;
+    background: transparent; border: 1px solid var(--border-light); color: var(--text-2);
+  }
+  .btn-sm:hover { background: var(--bg); }
+  .btn-danger {
+    padding: 7px 16px; background: transparent;
+    border: 1.5px solid var(--danger); color: var(--danger);
+  }
+  .btn-danger:hover { background: var(--danger-bg); }
+
+  .row { display: flex; align-items: center; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+  .ml-auto { margin-left: auto; }
+
+  /* ── Saved script banner ── */
+  .saved-banner {
+    background: var(--success-bg); border: 1.5px solid #9FE1CB;
+    border-radius: 8px; padding: 10px 14px; margin-bottom: 12px;
+    font-size: 13px; color: var(--success);
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  }
+  .saved-banner-text { display: flex; align-items: center; gap: 6px; }
+
+  /* ── Script display ── */
+  .script-text { font-size: 14px; line-height: 1.9; color: var(--text); }
+
+  /* ── TTS ── */
+  .tts-section {
+    margin-top: 1rem; padding-top: 1rem;
+    border-top: 1px solid var(--border-light);
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .tts-row { display: flex; align-items: center; gap: 8px; }
+  .tts-lbl { font-size: 11px; color: var(--text-3); white-space: nowrap; min-width: 26px; }
+  .prog-wrap { flex: 1; height: 4px; background: var(--bg); border-radius: 2px; overflow: hidden; min-width: 40px; }
+  .prog-bar { height: 100%; width: 0%; background: var(--purple); border-radius: 2px; transition: width 0.3s; }
+  select {
+    font-family: 'DM Sans', sans-serif; font-size: 12px; padding: 5px 8px;
+    border: 1.5px solid var(--border); border-radius: 8px;
+    background: var(--card); color: var(--text); cursor: pointer; flex: 1; min-width: 0;
+  }
+  select:focus { outline: none; border-color: var(--purple); }
+  .quality-pill {
+    font-size: 11px; font-weight: 500; color: var(--purple-deeper);
+    background: var(--purple-mid); border-radius: 20px; padding: 2px 10px;
+    white-space: nowrap; flex-shrink: 0;
+  }
+
+  /* ── Tabs ── */
+  .tabs {
+    display: flex; gap: 4px; background: var(--bg);
+    border: 1.5px solid var(--border-light); border-radius: 10px;
+    padding: 4px; margin-bottom: 1rem;
+  }
+  .tab {
+    flex: 1; font-size: 13px; font-weight: 500; padding: 7px;
+    border: none; border-radius: 7px; background: transparent;
+    color: var(--text-3); cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s;
+  }
+  .tab.active { background: var(--card); color: var(--text); border: 1.5px solid var(--border); }
+
+  /* ── Flashcard ── */
+  .fc-wrap { perspective: 900px; max-width: 520px; margin: 0 auto; }
+  .fc {
+    width: 100%; height: 210px; position: relative;
+    transform-style: preserve-3d; transition: transform 0.45s cubic-bezier(0.4,0,0.2,1); cursor: pointer;
+  }
+  .fc.flipped { transform: rotateY(180deg); }
+  .fc-face {
+    position: absolute; inset: 0; backface-visibility: hidden;
+    border-radius: var(--radius); display: flex; flex-direction: column;
+    align-items: center; justify-content: center; padding: 1.5rem; text-align: center;
+  }
+  .fc-front { background: var(--purple-light); border: 2px solid var(--purple); }
+  .fc-back { background: #FAFAF9; border: 2px solid var(--border); transform: rotateY(180deg); }
+  .fc-sublabel { font-size: 10px; font-weight: 500; letter-spacing: 0.09em; text-transform: uppercase; margin-bottom: 10px; }
+  .fc-front .fc-sublabel { color: var(--purple-dark); }
+  .fc-back .fc-sublabel { color: var(--text-3); }
+  .fc-phrase { font-size: 16px; font-weight: 500; color: var(--purple-deeper); line-height: 1.4; }
+  .fc-meaning { font-size: 13px; color: var(--text-2); line-height: 1.65; }
+  .fc-example { font-size: 12px; color: var(--text-3); font-style: italic; margin-top: 8px; line-height: 1.5; }
+  .fc-hint { font-size: 12px; color: var(--text-3); text-align: center; margin-top: 8px; }
+  .fc-nav { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 1rem; }
+  .fc-count { font-size: 13px; color: var(--text-2); min-width: 50px; text-align: center; }
+
+  /* ── List view ── */
+  .phrase-item { padding: 13px 0; border-bottom: 1px solid var(--border-light); }
+  .phrase-item:last-child { border-bottom: none; }
+  .phrase-pill {
+    display: inline-block; font-size: 13px; font-weight: 500;
+    color: var(--purple-deeper); background: var(--purple-light);
+    border: 1.5px solid var(--purple-border); border-radius: 8px;
+    padding: 3px 10px; margin-bottom: 6px;
+  }
+  .phrase-meaning { font-size: 13px; color: var(--text-2); line-height: 1.65; margin-bottom: 4px; }
+  .phrase-example { font-size: 12px; color: var(--text-3); font-style: italic; }
+
+  /* ── Misc ── */
+  .error-box {
+    font-size: 13px; color: var(--danger); background: var(--danger-bg);
+    border: 1px solid #F5C6C4; border-radius: 8px; padding: 10px 14px; margin-top: 8px;
+  }
+  .loading-box {
+    text-align: center; padding: 2rem 1rem;
+    font-size: 13px; color: var(--text-3);
+  }
+  .hidden { display: none; }
+
+  /* ── Responsive ── */
+  @media (max-width: 560px) {
+    .page { padding: 1.25rem 1rem 3rem; }
+    .header h1 { font-size: 18px; }
+    textarea { font-size: 15px; }
+    #script-input { min-height: 160px; }
+    .btn-primary { width: 100%; justify-content: center; padding: 11px; }
+    .ml-auto { margin-left: 0; width: 100%; }
+    .fc { height: 230px; }
+    .fc-phrase { font-size: 15px; }
+    .btn-nav { padding: 11px 16px; flex: 1; justify-content: center; }
+    .fc-nav { gap: 8px; width: 100%; }
+    .tts-row { flex-wrap: wrap; }
+    .tab { font-size: 12px; padding: 8px 4px; }
+    .modal { padding: 1.25rem; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Settings Modal -->
+  <div class="modal-overlay hidden" id="settings-modal">
+    <div class="modal">
+      <h2>API設定</h2>
+      <p>キーはこのデバイスのブラウザ（localStorage）にのみ保存されます。外部には送信されません。</p>
+      <div class="modal-field">
+        <label class="modal-label">Anthropic API Key</label>
+        <input class="modal-input" type="password" id="input-anthropic-key" placeholder="sk-ant-..." autocomplete="off" />
+      </div>
+      <div class="modal-field">
+        <label class="modal-label">GitHub Personal Access Token</label>
+        <input class="modal-input" type="password" id="input-github-token" placeholder="ghp_..." autocomplete="off" />
+      </div>
+      <div class="modal-row">
+        <button class="btn btn-outline" onclick="closeSettings()">キャンセル</button>
+        <button class="btn btn-primary" onclick="saveSettings()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <div class="header">
+    <div class="week-badge">📅 <span id="week-label"></span></div>
+    <h1>Weekly Presentation Trainer</h1>
+    <p>スクリプト入力 · リスニング · フレーズ復習</p>
+  </div>
+
+  <!-- Settings bar -->
+  <div class="settings-bar">
+    <span id="key-status-anthropic" class="key-status ng">Anthropic: 未設定</span>
+    <span id="key-status-github" class="key-status ng">GitHub: 未設定</span>
+    <button class="btn-settings" onclick="openSettings()">⚙ APIキーを設定</button>
+  </div>
+
+  <!-- View: Input -->
+  <div id="view-input">
+
+    <!-- Saved script banner -->
+    <div id="saved-banner" class="saved-banner hidden">
+      <div class="saved-banner-text">
+        ✅ <span id="saved-script-info">保存済みのスクリプトがあります</span>
+      </div>
+      <button class="btn btn-sm" onclick="loadSavedData()">読み込む</button>
+    </div>
+
+    <div class="step-row">
+      <div class="step-num">1</div>
+      <div class="step-label">スクリプトを入力する</div>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title">📄 Presentation script</div>
+        <span class="tag" id="live-count">0 words</span>
+      </div>
+      <textarea id="script-input" placeholder="英語のプレゼンスクリプトをここに貼り付けてください..."></textarea>
+      <div class="word-counter" id="word-hint">目安：280〜320語（約2〜2.5分）</div>
+    </div>
+
+    <div class="step-row">
+      <div class="step-num">2</div>
+      <div class="step-label">フレーズを自動抽出して保存する</div>
+    </div>
+    <div class="card">
+      <div class="hint">
+        「抽出して保存」を押すと、Claude APIがスクリプトからキーフレーズを自動抽出し、GitHub Gistに保存します。PC・スマートフォンどちらからでも読み込めます。
+      </div>
+      <div id="extract-error" class="error-box hidden"></div>
+      <div class="row">
+        <div class="ml-auto">
+          <button class="btn btn-primary" id="extract-btn" onclick="extractAndSave()">
+            ✨ 抽出して保存
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- View: Result -->
+  <div id="view-result" class="hidden">
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title">📄 Script</div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="tag" id="word-count"></span>
+          <button class="btn btn-sm" onclick="showInputView()">✏️ 更新</button>
+        </div>
+      </div>
+      <div class="script-text" id="script-display"></div>
+      <div class="tts-section">
+        <div class="tts-row">
+          <button class="btn btn-play" id="play-btn" onclick="toggleTTS()">
+            <span id="play-icon">▶</span>
+            <span id="play-label">Play</span>
+          </button>
+          <div class="prog-wrap"><div class="prog-bar" id="progress-bar"></div></div>
+        </div>
+        <div class="tts-row">
+          <span class="tts-lbl">音声</span>
+          <select id="voice-select" onchange="onVoiceChange()"></select>
+          <span class="quality-pill hidden" id="voice-quality-tag"></span>
+        </div>
+        <div class="tts-row">
+          <span class="tts-lbl">速度</span>
+          <select id="speed-select" style="max-width:120px;">
+            <option value="0.8">0.8×</option>
+            <option value="0.9">0.9×</option>
+            <option value="1.0" selected>1.0×</option>
+            <option value="1.1">1.1×</option>
+            <option value="1.2">1.2×</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title">🃏 Key phrases & structures</div>
+        <span class="tag" id="phrase-total"></span>
+      </div>
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('flashcard', this)">Flashcard</button>
+        <button class="tab" onclick="switchTab('list', this)">List view</button>
+      </div>
+
+      <div id="flashcard-view">
+        <div class="fc-wrap">
+          <div class="fc" id="flashcard" onclick="flipCard()">
+            <div class="fc-face fc-front">
+              <div class="fc-sublabel">phrase / structure</div>
+              <div class="fc-phrase" id="fc-phrase">—</div>
+            </div>
+            <div class="fc-face fc-back">
+              <div class="fc-sublabel">meaning & usage</div>
+              <div class="fc-meaning" id="fc-meaning">—</div>
+              <div class="fc-example" id="fc-example">—</div>
+            </div>
+          </div>
+        </div>
+        <div class="fc-hint">カードをタップして裏返す</div>
+        <div class="fc-nav">
+          <button class="btn btn-nav" onclick="prevCard()">← 前へ</button>
+          <span class="fc-count" id="fc-counter">0 / 0</span>
+          <button class="btn btn-nav" onclick="nextCard()">次へ →</button>
+        </div>
+      </div>
+
+      <div id="list-view" class="hidden">
+        <div id="phrase-list"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// =====================================================
+// CONFIG — ここを書き換えてください
+// =====================================================
+const GIST_ID = '3e51837baf84554a02befb4235600ca6'; // ← 設定済み
+
+// APIキーはlocalStorageから読み込みます（設定モーダルで入力）
+// =====================================================
+
+let phrases = [], cardIndex = 0, isFlipped = false;
+let utterance = null, isSpeaking = false, progressInterval = null;
+let availableVoices = [], selectedVoice = null;
+
+function getAnthropicKey() { return localStorage.getItem('pt_anthropic_key') || ''; }
+function getGithubToken() { return localStorage.getItem('pt_github_token') || ''; }
+
+// ── Week label ──
+const now = new Date();
+const yr = now.getFullYear();
+const startOfYear = new Date(yr, 0, 1);
+const wk = Math.ceil(((now - startOfYear) / 86400000 + startOfYear.getDay() + 1) / 7);
+document.getElementById('week-label').textContent = `Week ${wk}, ${yr}`;
+
+// ── Key status UI ──
+function updateKeyStatus() {
+  const ak = getAnthropicKey();
+  const gh = getGithubToken();
+  const elA = document.getElementById('key-status-anthropic');
+  const elG = document.getElementById('key-status-github');
+  if (ak) { elA.textContent = 'Anthropic ✓'; elA.className = 'key-status ok'; }
+  else { elA.textContent = 'Anthropic: 未設定'; elA.className = 'key-status ng'; }
+  if (gh) { elG.textContent = 'GitHub ✓'; elG.className = 'key-status ok'; }
+  else { elG.textContent = 'GitHub: 未設定'; elG.className = 'key-status ng'; }
+}
+
+// ── Settings modal ──
+function openSettings() {
+  document.getElementById('input-anthropic-key').value = getAnthropicKey();
+  document.getElementById('input-github-token').value = getGithubToken();
+  document.getElementById('settings-modal').classList.remove('hidden');
+}
+function closeSettings() { document.getElementById('settings-modal').classList.add('hidden'); }
+function saveSettings() {
+  const ak = document.getElementById('input-anthropic-key').value.trim();
+  const gh = document.getElementById('input-github-token').value.trim();
+  if (ak) localStorage.setItem('pt_anthropic_key', ak);
+  if (gh) localStorage.setItem('pt_github_token', gh);
+  updateKeyStatus();
+  closeSettings();
+}
+
+// ── Gist: load ──
+async function loadFromGist() {
+  const token = getGithubToken();
+  if (!token) return null;
+  try {
+    const res = await fetch(`https://api.github.com/gists/${GIST_ID}`, {
+      headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' }
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    const content = data.files['pt_data.json']?.content;
+    if (!content || content === '{}') return null;
+    return JSON.parse(content);
+  } catch(e) { return null; }
+}
+
+// ── Gist: save ──
+async function saveToGist(payload) {
+  const token = getGithubToken();
+  if (!token) throw new Error('GitHub tokenが設定されていません');
+  const res = await fetch(`https://api.github.com/gists/${GIST_ID}`, {
+    method: 'PATCH',
+    headers: {
+      'Authorization': `token ${token}`,
+      'Accept': 'application/vnd.github.v3+json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ files: { 'pt_data.json': { content: JSON.stringify(payload) } } })
+  });
+  if (!res.ok) throw new Error('Gistへの保存に失敗しました');
+}
+
+// ── Check saved data on load ──
+async function checkSavedData() {
+  const data = await loadFromGist();
+  if (data && data.script) {
+    const words = countWords(data.script);
+    const saved = document.getElementById('saved-banner');
+    document.getElementById('saved-script-info').textContent =
+      `保存済みスクリプトあり（${words} words · ${data.phrases?.length || 0} phrases）`;
+    saved.classList.remove('hidden');
+  }
+}
+
+function loadSavedData() {
+  loadFromGist().then(data => {
+    if (!data || !data.script) return;
+    renderResult(data.script, data.phrases || []);
+  });
+}
+
+// ── Extract & Save ──
+async function extractAndSave() {
+  const script = document.getElementById('script-input').value.trim();
+  if (!script) {
+    showExtractError('スクリプトを入力してください。');
+    return;
+  }
+  const ak = getAnthropicKey();
+  if (!ak) { openSettings(); return; }
+  const gh = getGithubToken();
+  if (!gh) { openSettings(); return; }
+
+  const btn = document.getElementById('extract-btn');
+  btn.disabled = true;
+  btn.textContent = '⏳ 抽出中...';
+  document.getElementById('extract-error').classList.add('hidden');
+
+  const prompt = `You are an English presentation coach helping a Japanese academic learner.
+
+Analyze the following English presentation script and extract key phrases and sentence structures worth memorizing.
+
+Script:
+"""
+${script}
+"""
+
+Respond ONLY with a raw JSON array. No explanation, no markdown, no backticks. Start with [ and end with ].
+
+[
+  {
+    "phrase": "the exact phrase or structure from the script",
+    "meaning": "日本語で：意味・使い方・どんな場面で使うかを2〜3文で説明",
+    "example": "A natural example sentence using this phrase"
+  }
+]
+
+Extract 6-8 phrases. Focus on discourse markers, academic expressions, and reusable presentation phrases. Meanings in Japanese.`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': ak,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5',
+        max_tokens: 1500,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    const apiData = await res.json();
+    if (apiData.type === 'error') throw new Error(apiData.error?.message || 'API error');
+
+    const raw = (apiData.content || []).map(b => b.text || '').join('').trim();
+    const match = raw.match(/\[[\s\S]*\]/);
+    if (!match) throw new Error('フレーズの抽出に失敗しました');
+    const extracted = JSON.parse(match[0]);
+
+    await saveToGist({ script, phrases: extracted, savedAt: new Date().toISOString() });
+    renderResult(script, extracted);
+
+  } catch(e) {
+    showExtractError(`エラー：${e.message}`);
+  }
+
+  btn.disabled = false;
+  btn.textContent = '✨ 抽出して保存';
+}
+
+function showExtractError(msg) {
+  const el = document.getElementById('extract-error');
+  el.textContent = msg; el.classList.remove('hidden');
+}
+
+// ── Render result ──
+function renderResult(script, extractedPhrases) {
+  phrases = extractedPhrases;
+  document.getElementById('view-input').classList.add('hidden');
+  document.getElementById('view-result').classList.remove('hidden');
+  document.getElementById('script-display').textContent = script;
+
+  const words = countWords(script);
+  document.getElementById('word-count').textContent = `${words} words · ~${(words / 130).toFixed(1)} min`;
+  document.getElementById('phrase-total').textContent = `${phrases.length} phrases`;
+  cardIndex = 0; showCard(0);
+
+  const listEl = document.getElementById('phrase-list');
+  listEl.innerHTML = '';
+  phrases.forEach(p => {
+    const d = document.createElement('div');
+    d.className = 'phrase-item';
+    d.innerHTML = `<div class="phrase-pill">${p.phrase}</div><div class="phrase-meaning">${p.meaning}</div><div class="phrase-example">"${p.example}"</div>`;
+    listEl.appendChild(d);
+  });
+  setTimeout(populateVoices, 300);
+}
+
+function showInputView() {
+  speechSynthesis.cancel(); stopProgress();
+  document.getElementById('view-result').classList.add('hidden');
+  document.getElementById('view-input').classList.remove('hidden');
+}
+
+// ── Word counter ──
+function countWords(t) { return t.trim() === '' ? 0 : t.trim().split(/\s+/).length; }
+
+document.getElementById('script-input').addEventListener('input', () => {
+  const w = countWords(document.getElementById('script-input').value);
+  document.getElementById('live-count').textContent = `${w} words`;
+  const hint = document.getElementById('word-hint');
+  if (w > 0 && (w < 250 || w > 380)) {
+    hint.className = 'word-counter warn';
+    hint.textContent = w < 250 ? '目安より少なめです（目標：280〜320語）' : '目安より多めです（目標：280〜320語）';
+  } else {
+    hint.className = 'word-counter';
+    hint.textContent = '目安：280〜320語（約2〜2.5分）';
+  }
+});
+
+// ── Flashcard ──
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('flashcard-view').classList.toggle('hidden', name !== 'flashcard');
+  document.getElementById('list-view').classList.toggle('hidden', name !== 'list');
+}
+function flipCard() {
+  isFlipped = !isFlipped;
+  document.getElementById('flashcard').classList.toggle('flipped', isFlipped);
+}
+function showCard(i) {
+  if (!phrases.length) return;
+  isFlipped = false;
+  document.getElementById('flashcard').classList.remove('flipped');
+  const p = phrases[i];
+  document.getElementById('fc-phrase').textContent = p.phrase;
+  document.getElementById('fc-meaning').textContent = p.meaning;
+  document.getElementById('fc-example').textContent = '"' + p.example + '"';
+  document.getElementById('fc-counter').textContent = `${i + 1} / ${phrases.length}`;
+}
+function nextCard() { cardIndex = (cardIndex + 1) % phrases.length; showCard(cardIndex); }
+function prevCard() { cardIndex = (cardIndex - 1 + phrases.length) % phrases.length; showCard(cardIndex); }
+
+// ── TTS ──
+function voiceScore(v) {
+  const n = v.name.toLowerCase();
+  if (n.includes('enhanced') && v.lang.startsWith('en')) return 90;
+  if (n.includes('samantha')) return 80;
+  if (n.includes('google') && v.lang === 'en-US') return 70;
+  if (n.includes('google') && v.lang.startsWith('en')) return 65;
+  if (v.lang === 'en-US') return 40;
+  if (v.lang.startsWith('en')) return 30;
+  return 0;
+}
+function populateVoices() {
+  const voices = speechSynthesis.getVoices().filter(v => v.lang.startsWith('en'));
+  if (!voices.length) return;
+  voices.sort((a, b) => voiceScore(b) - voiceScore(a));
+  availableVoices = voices;
+  const sel = document.getElementById('voice-select');
+  sel.innerHTML = '';
+  voices.forEach((v, i) => {
+    const opt = document.createElement('option');
+    opt.value = i;
+    let label = v.name;
+    if (v.name.toLowerCase().includes('enhanced')) label += ' ★';
+    else if (v.name.toLowerCase().includes('google')) label += ' ◆';
+    opt.textContent = `${label} (${v.lang})`;
+    sel.appendChild(opt);
+  });
+  selectedVoice = voices[0];
+  updateQualityTag(voices[0]);
+}
+function onVoiceChange() {
+  selectedVoice = availableVoices[parseInt(document.getElementById('voice-select').value)];
+  updateQualityTag(selectedVoice);
+}
+function updateQualityTag(v) {
+  const tag = document.getElementById('voice-quality-tag');
+  const n = v.name.toLowerCase();
+  if (n.includes('enhanced')) { tag.textContent = '高品質'; tag.classList.remove('hidden'); }
+  else if (n.includes('google')) { tag.textContent = 'Google'; tag.classList.remove('hidden'); }
+  else tag.classList.add('hidden');
+}
+if (speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = populateVoices;
+setTimeout(populateVoices, 200);
+
+function toggleTTS() {
+  if (isSpeaking) { speechSynthesis.cancel(); stopProgress(); return; }
+  const text = document.getElementById('script-display').textContent;
+  if (!text) return;
+  utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = 'en-US';
+  utterance.rate = parseFloat(document.getElementById('speed-select').value);
+  if (selectedVoice) utterance.voice = selectedVoice;
+  const totalChars = text.length;
+  utterance.onstart = () => {
+    isSpeaking = true;
+    document.getElementById('play-icon').textContent = '⏸';
+    document.getElementById('play-label').textContent = 'Pause';
+    let prog = 0;
+    progressInterval = setInterval(() => {
+      prog = Math.min(prog + totalChars / (utterance.rate * 120), totalChars);
+      document.getElementById('progress-bar').style.width = Math.round((prog / totalChars) * 100) + '%';
+    }, 500);
+  };
+  utterance.onend = utterance.onerror = () => stopProgress();
+  speechSynthesis.speak(utterance);
+}
+function stopProgress() {
+  isSpeaking = false; clearInterval(progressInterval);
+  document.getElementById('play-icon').textContent = '▶';
+  document.getElementById('play-label').textContent = 'Play';
+  document.getElementById('progress-bar').style.width = '0%';
+}
+
+// ── Init ──
+updateKeyStatus();
+checkSavedData();
+</script>
+</body>
+</html>
