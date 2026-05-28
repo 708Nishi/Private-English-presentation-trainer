@@ -881,11 +881,18 @@ async function toggleTTS() {
 
 async function playOpenAITTS(text, apiKey, speed) {
   const voice = document.getElementById('openai-voice-select').value;
-  const btn = document.getElementById('play-btn');
 
   isSpeaking = true;
   document.getElementById('play-icon').textContent = '⏳';
   document.getElementById('play-label').textContent = '生成中...';
+
+  // iOSのAutoplay制限対策：
+  // ユーザー操作のタイミングでAudioContextを即座に作成・resumeしておく
+  let audioCtx = null;
+  try {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    await audioCtx.resume();
+  } catch(e) { /* 非対応環境はスキップ */ }
 
   try {
     const res = await fetch('https://api.openai.com/v1/audio/speech', {
@@ -907,30 +914,55 @@ async function playOpenAITTS(text, apiKey, speed) {
       throw new Error(err.error?.message || 'OpenAI TTSエラー');
     }
 
-    const blob = await res.blob();
-    const url = URL.createObjectURL(blob);
-    currentAudio = new Audio(url);
+    const arrayBuffer = await res.arrayBuffer();
 
-    document.getElementById('play-icon').textContent = '⏸';
-    document.getElementById('play-label').textContent = 'Pause';
+    // AudioContextを使って再生（iOSでAutoplay制限を回避）
+    if (audioCtx) {
+      const decoded = await audioCtx.decodeAudioData(arrayBuffer);
+      const source = audioCtx.createBufferSource();
+      source.buffer = decoded;
+      source.playbackRate.value = 1.0; // speed はAPIに渡し済み
+      source.connect(audioCtx.destination);
 
-    currentAudio.onended = () => {
-      stopProgress();
-      URL.revokeObjectURL(url);
-    };
-    currentAudio.onerror = () => stopProgress();
+      document.getElementById('play-icon').textContent = '⏸';
+      document.getElementById('play-label').textContent = 'Pause';
 
-    // プログレスバー
-    currentAudio.onloadedmetadata = () => {
-      const duration = currentAudio.duration;
+      const duration = decoded.duration;
       progressInterval = setInterval(() => {
-        if (!currentAudio) return;
-        const pct = (currentAudio.currentTime / duration) * 100;
-        document.getElementById('progress-bar').style.width = Math.min(pct, 100) + '%';
+        const elapsed = audioCtx.currentTime - startTime;
+        const pct = Math.min((elapsed / duration) * 100, 100);
+        document.getElementById('progress-bar').style.width = pct + '%';
+        if (elapsed >= duration) stopProgress();
       }, 200);
-    };
 
-    await currentAudio.play();
+      const startTime = audioCtx.currentTime;
+      source.start(0);
+
+      // 停止用に保持
+      currentAudio = { pause: () => { source.stop(); audioCtx.close(); } };
+      source.onended = () => stopProgress();
+
+    } else {
+      // AudioContext非対応の場合はBlobURLフォールバック
+      const blob = new Blob([arrayBuffer], { type: 'audio/mpeg' });
+      const url = URL.createObjectURL(blob);
+      currentAudio = new Audio(url);
+
+      document.getElementById('play-icon').textContent = '⏸';
+      document.getElementById('play-label').textContent = 'Pause';
+
+      currentAudio.onended = () => { stopProgress(); URL.revokeObjectURL(url); };
+      currentAudio.onerror = () => stopProgress();
+      currentAudio.onloadedmetadata = () => {
+        const duration = currentAudio.duration;
+        progressInterval = setInterval(() => {
+          if (!currentAudio) return;
+          document.getElementById('progress-bar').style.width =
+            Math.min((currentAudio.currentTime / duration) * 100, 100) + '%';
+        }, 200);
+      };
+      await currentAudio.play();
+    }
 
   } catch(e) {
     stopProgress();
