@@ -335,6 +335,10 @@
         <input class="modal-input" type="password" id="input-anthropic-key" placeholder="sk-ant-..." autocomplete="off" />
       </div>
       <div class="modal-field">
+        <label class="modal-label">OpenAI API Key（音声読み上げ用）</label>
+        <input class="modal-input" type="password" id="input-openai-key" placeholder="sk-..." autocomplete="off" />
+      </div>
+      <div class="modal-field">
         <label class="modal-label">GitHub Personal Access Token</label>
         <input class="modal-input" type="password" id="input-github-token" placeholder="ghp_..." autocomplete="off" />
       </div>
@@ -355,6 +359,7 @@
   <!-- Settings bar -->
   <div class="settings-bar">
     <span id="key-status-anthropic" class="key-status ng">Anthropic: 未設定</span>
+    <span id="key-status-openai" class="key-status ng">OpenAI: 未設定</span>
     <span id="key-status-github" class="key-status ng">GitHub: 未設定</span>
     <button class="btn-settings" onclick="openSettings()">⚙ APIキーを設定</button>
   </div>
@@ -422,6 +427,24 @@
           <div class="prog-wrap"><div class="prog-bar" id="progress-bar"></div></div>
         </div>
         <div class="tts-row">
+          <span class="tts-lbl">エンジン</span>
+          <select id="tts-engine-select" onchange="onEngineChange()">
+            <option value="openai">OpenAI TTS（高品質）</option>
+            <option value="browser">ブラウザ内蔵</option>
+          </select>
+        </div>
+        <div id="openai-voice-row" class="tts-row">
+          <span class="tts-lbl">声</span>
+          <select id="openai-voice-select">
+            <option value="alloy">Alloy（中性的）</option>
+            <option value="echo">Echo（男性的）</option>
+            <option value="fable">Fable（英国風）</option>
+            <option value="onyx">Onyx（低め・男性）</option>
+            <option value="nova" selected>Nova（女性的）</option>
+            <option value="shimmer">Shimmer（明るい女性）</option>
+          </select>
+        </div>
+        <div id="browser-voice-row" class="tts-row hidden">
           <span class="tts-lbl">音声</span>
           <select id="voice-select" onchange="onVoiceChange()"></select>
           <span class="quality-pill hidden" id="voice-quality-tag"></span>
@@ -494,6 +517,7 @@ let availableVoices = [], selectedVoice = null;
 
 function getAnthropicKey() { return localStorage.getItem('pt_anthropic_key') || ''; }
 function getGithubToken() { return localStorage.getItem('pt_github_token') || ''; }
+function getOpenAIKey() { return localStorage.getItem('pt_openai_key') || ''; }
 
 // ── Week label ──
 const now = new Date();
@@ -506,26 +530,33 @@ document.getElementById('week-label').textContent = `Week ${wk}, ${yr}`;
 function updateKeyStatus() {
   const ak = getAnthropicKey();
   const gh = getGithubToken();
+  const ok = getOpenAIKey();
   const elA = document.getElementById('key-status-anthropic');
   const elG = document.getElementById('key-status-github');
+  const elO = document.getElementById('key-status-openai');
   if (ak) { elA.textContent = 'Anthropic ✓'; elA.className = 'key-status ok'; }
   else { elA.textContent = 'Anthropic: 未設定'; elA.className = 'key-status ng'; }
   if (gh) { elG.textContent = 'GitHub ✓'; elG.className = 'key-status ok'; }
   else { elG.textContent = 'GitHub: 未設定'; elG.className = 'key-status ng'; }
+  if (ok) { elO.textContent = 'OpenAI ✓'; elO.className = 'key-status ok'; }
+  else { elO.textContent = 'OpenAI: 未設定'; elO.className = 'key-status ng'; }
 }
 
 // ── Settings modal ──
 function openSettings() {
   document.getElementById('input-anthropic-key').value = getAnthropicKey();
   document.getElementById('input-github-token').value = getGithubToken();
+  document.getElementById('input-openai-key').value = getOpenAIKey();
   document.getElementById('settings-modal').classList.remove('hidden');
 }
 function closeSettings() { document.getElementById('settings-modal').classList.add('hidden'); }
 function saveSettings() {
   const ak = document.getElementById('input-anthropic-key').value.trim();
   const gh = document.getElementById('input-github-token').value.trim();
+  const ok = document.getElementById('input-openai-key').value.trim();
   if (ak) localStorage.setItem('pt_anthropic_key', ak);
   if (gh) localStorage.setItem('pt_github_token', gh);
+  if (ok) localStorage.setItem('pt_openai_key', ok);
   updateKeyStatus();
   closeSettings();
 }
@@ -770,7 +801,16 @@ function showCard(i) {
 function nextCard() { cardIndex = (cardIndex + 1) % phrases.length; showCard(cardIndex); }
 function prevCard() { cardIndex = (cardIndex - 1 + phrases.length) % phrases.length; showCard(cardIndex); }
 
+// ── TTS engine toggle ──
+function onEngineChange() {
+  const engine = document.getElementById('tts-engine-select').value;
+  document.getElementById('openai-voice-row').classList.toggle('hidden', engine !== 'openai');
+  document.getElementById('browser-voice-row').classList.toggle('hidden', engine !== 'browser');
+}
+
 // ── TTS ──
+let currentAudio = null;
+
 function voiceScore(v) {
   const n = v.name.toLowerCase();
   if (n.includes('enhanced') && v.lang.startsWith('en')) return 90;
@@ -814,14 +854,94 @@ function updateQualityTag(v) {
 if (speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = populateVoices;
 setTimeout(populateVoices, 200);
 
-function toggleTTS() {
-  if (isSpeaking) { speechSynthesis.cancel(); stopProgress(); return; }
+async function toggleTTS() {
+  // 再生中なら停止
+  if (isSpeaking) {
+    if (currentAudio) { currentAudio.pause(); currentAudio = null; }
+    speechSynthesis.cancel();
+    stopProgress();
+    return;
+  }
+
   const el = document.getElementById('script-display');
-  const text = el.innerText || el.textContent; // HTMLタグを除いたテキストで読み上げ
+  const text = el.innerText || el.textContent;
   if (!text) return;
+
+  const engine = document.getElementById('tts-engine-select').value;
+  const speed = parseFloat(document.getElementById('speed-select').value);
+
+  if (engine === 'openai') {
+    const ok = getOpenAIKey();
+    if (!ok) { openSettings(); return; }
+    await playOpenAITTS(text, ok, speed);
+  } else {
+    playBrowserTTS(text, speed);
+  }
+}
+
+async function playOpenAITTS(text, apiKey, speed) {
+  const voice = document.getElementById('openai-voice-select').value;
+  const btn = document.getElementById('play-btn');
+
+  isSpeaking = true;
+  document.getElementById('play-icon').textContent = '⏳';
+  document.getElementById('play-label').textContent = '生成中...';
+
+  try {
+    const res = await fetch('https://api.openai.com/v1/audio/speech', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: 'tts-1-hd',
+        input: text,
+        voice: voice,
+        speed: Math.min(Math.max(speed, 0.25), 4.0)
+      })
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error?.message || 'OpenAI TTSエラー');
+    }
+
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    currentAudio = new Audio(url);
+
+    document.getElementById('play-icon').textContent = '⏸';
+    document.getElementById('play-label').textContent = 'Pause';
+
+    currentAudio.onended = () => {
+      stopProgress();
+      URL.revokeObjectURL(url);
+    };
+    currentAudio.onerror = () => stopProgress();
+
+    // プログレスバー
+    currentAudio.onloadedmetadata = () => {
+      const duration = currentAudio.duration;
+      progressInterval = setInterval(() => {
+        if (!currentAudio) return;
+        const pct = (currentAudio.currentTime / duration) * 100;
+        document.getElementById('progress-bar').style.width = Math.min(pct, 100) + '%';
+      }, 200);
+    };
+
+    await currentAudio.play();
+
+  } catch(e) {
+    stopProgress();
+    alert(`音声生成エラー：${e.message}`);
+  }
+}
+
+function playBrowserTTS(text, speed) {
   utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = 'en-US';
-  utterance.rate = parseFloat(document.getElementById('speed-select').value);
+  utterance.rate = speed;
   if (selectedVoice) utterance.voice = selectedVoice;
   const totalChars = text.length;
   utterance.onstart = () => {
@@ -830,13 +950,14 @@ function toggleTTS() {
     document.getElementById('play-label').textContent = 'Pause';
     let prog = 0;
     progressInterval = setInterval(() => {
-      prog = Math.min(prog + totalChars / (utterance.rate * 120), totalChars);
+      prog = Math.min(prog + totalChars / (speed * 120), totalChars);
       document.getElementById('progress-bar').style.width = Math.round((prog / totalChars) * 100) + '%';
     }, 500);
   };
   utterance.onend = utterance.onerror = () => stopProgress();
   speechSynthesis.speak(utterance);
 }
+
 function stopProgress() {
   isSpeaking = false; clearInterval(progressInterval);
   document.getElementById('play-icon').textContent = '▶';
