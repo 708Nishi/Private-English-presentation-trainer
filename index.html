@@ -210,6 +210,17 @@
 
   /* ── Script display ── */
   .script-text { font-size: 14px; line-height: 1.9; color: var(--text); }
+  .script-text mark {
+    background: var(--purple-light);
+    color: var(--purple-deeper);
+    border-bottom: 2px solid var(--purple);
+    border-radius: 3px;
+    padding: 1px 2px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .script-text mark:hover { background: var(--purple-mid); }
 
   /* ── TTS ── */
   .tts-section {
@@ -648,12 +659,54 @@ function showExtractError(msg) {
   el.textContent = msg; el.classList.remove('hidden');
 }
 
+// ── Highlight phrases in script ──
+function highlightScript(script, extractedPhrases) {
+  // エスケープしてからハイライト
+  let escaped = script
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+
+  // フレーズを長い順に並び替えて部分一致の衝突を防ぐ
+  const sorted = [...extractedPhrases].sort((a, b) => b.phrase.length - a.phrase.length);
+
+  sorted.forEach((p, idx) => {
+    const phraseEscaped = p.phrase
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const re = new RegExp(`(${phraseEscaped})`, 'gi');
+    escaped = escaped.replace(re, `<mark data-idx="${idx}" onclick="jumpToCard(${idx})" title="${p.phrase}">$1</mark>`);
+  });
+
+  return escaped;
+}
+
+// ── Jump to flashcard from highlight ──
+function jumpToCard(idx) {
+  cardIndex = idx;
+  // List viewならFlashcardに切り替え
+  const fcView = document.getElementById('flashcard-view');
+  if (fcView.classList.contains('hidden')) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab')[0].classList.add('active');
+    fcView.classList.remove('hidden');
+    document.getElementById('list-view').classList.add('hidden');
+  }
+  showCard(idx);
+  // フラッシュカードまでスクロール
+  document.getElementById('flashcard').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
 // ── Render result ──
 function renderResult(script, extractedPhrases) {
   phrases = extractedPhrases;
   document.getElementById('view-input').classList.add('hidden');
   document.getElementById('view-result').classList.remove('hidden');
-  document.getElementById('script-display').textContent = script;
+
+  // ハイライト付きでスクリプトを表示
+  document.getElementById('script-display').innerHTML = highlightScript(script, extractedPhrases);
 
   const words = countWords(script);
   document.getElementById('word-count').textContent = `${words} words · ~${(words / 130).toFixed(1)} min`;
@@ -763,7 +816,8 @@ setTimeout(populateVoices, 200);
 
 function toggleTTS() {
   if (isSpeaking) { speechSynthesis.cancel(); stopProgress(); return; }
-  const text = document.getElementById('script-display').textContent;
+  const el = document.getElementById('script-display');
+  const text = el.innerText || el.textContent; // HTMLタグを除いたテキストで読み上げ
   if (!text) return;
   utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = 'en-US';
