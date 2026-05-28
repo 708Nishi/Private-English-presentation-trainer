@@ -190,11 +190,19 @@
     background: transparent; border: 1px solid var(--border-light); color: var(--text-2);
   }
   .btn-sm:hover { background: var(--bg); }
-  .btn-danger {
-    padding: 7px 16px; background: transparent;
-    border: 1.5px solid var(--danger); color: var(--danger);
+  .btn-repeat {
+    padding: 7px 11px; font-size: 15px;
+    background: transparent;
+    border: 1.5px solid var(--border-light);
+    border-radius: 8px; color: var(--text-3);
+    flex-shrink: 0; transition: all 0.15s;
   }
-  .btn-danger:hover { background: var(--danger-bg); }
+  .btn-repeat:hover { background: var(--bg); }
+  .btn-repeat.active {
+    background: var(--purple-light);
+    border-color: var(--purple-border);
+    color: var(--purple-deeper);
+  }
 
   .row { display: flex; align-items: center; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
   .ml-auto { margin-left: auto; }
@@ -425,6 +433,7 @@
             <span id="play-label">Play</span>
           </button>
           <div class="prog-wrap"><div class="prog-bar" id="progress-bar"></div></div>
+          <button class="btn btn-repeat" id="repeat-btn" onclick="toggleRepeat()" title="繰り返し再生">🔁</button>
         </div>
         <div class="tts-row">
           <span class="tts-lbl">エンジン</span>
@@ -514,6 +523,15 @@ const GIST_ID = '3e51837baf84554a02befb4235600ca6'; // ← 設定済み
 let phrases = [], cardIndex = 0, isFlipped = false;
 let utterance = null, isSpeaking = false, progressInterval = null;
 let availableVoices = [], selectedVoice = null;
+let isRepeat = false;
+let lastPlayText = '', lastPlayVoice = '', lastPlaySpeed = 1.0;
+
+function toggleRepeat() {
+  isRepeat = !isRepeat;
+  const btn = document.getElementById('repeat-btn');
+  btn.classList.toggle('active', isRepeat);
+  btn.title = isRepeat ? '繰り返し再生：ON' : '繰り返し再生：OFF';
+}
 
 function getAnthropicKey() { return localStorage.getItem('pt_anthropic_key') || ''; }
 function getGithubToken() { return localStorage.getItem('pt_github_token') || ''; }
@@ -870,6 +888,10 @@ async function toggleTTS() {
   const engine = document.getElementById('tts-engine-select').value;
   const speed = parseFloat(document.getElementById('speed-select').value);
 
+  // 繰り返し用に保存
+  lastPlayText = text;
+  lastPlaySpeed = speed;
+
   if (engine === 'openai') {
     const ok = getOpenAIKey();
     if (!ok) { openSettings(); return; }
@@ -879,15 +901,61 @@ async function toggleTTS() {
   }
 }
 
+// ── Audio cache (localStorage) ──
+function getAudioCacheKey(text, voice, speed) {
+  // スクリプト・声・速度の組み合わせでキャッシュキーを生成
+  const hash = btoa(encodeURIComponent(text.slice(0, 80) + voice + speed)).replace(/[^a-zA-Z0-9]/g, '').slice(0, 40);
+  return `pt_audio_${hash}`;
+}
+
+function saveAudioCache(key, base64) {
+  try {
+    localStorage.setItem(key, base64);
+    localStorage.setItem(key + '_ts', Date.now().toString());
+  } catch(e) {
+    // localStorageが満杯の場合は古いキャッシュを削除
+    clearOldAudioCache();
+    try { localStorage.setItem(key, base64); } catch(e2) { /* 諦める */ }
+  }
+}
+
+function loadAudioCache(key) {
+  return localStorage.getItem(key);
+}
+
+function clearOldAudioCache() {
+  const keys = Object.keys(localStorage).filter(k => k.startsWith('pt_audio_') && !k.endsWith('_ts'));
+  // タイムスタンプが古い順に削除
+  keys.sort((a, b) => {
+    const ta = parseInt(localStorage.getItem(a + '_ts') || '0');
+    const tb = parseInt(localStorage.getItem(b + '_ts') || '0');
+    return ta - tb;
+  });
+  keys.slice(0, Math.ceil(keys.length / 2)).forEach(k => {
+    localStorage.removeItem(k);
+    localStorage.removeItem(k + '_ts');
+  });
+}
+
 async function playOpenAITTS(text, apiKey, speed) {
   const voice = document.getElementById('openai-voice-select').value;
+  const cacheKey = getAudioCacheKey(text, voice, speed);
+  const cached = loadAudioCache(cacheKey);
 
   isSpeaking = true;
+
+  // キャッシュがあれば即座に再生
+  if (cached) {
+    document.getElementById('play-icon').textContent = '⏸';
+    document.getElementById('play-label').textContent = 'Pause';
+    await playBase64Audio(cached);
+    return;
+  }
+
+  // キャッシュなし → APIで生成
   document.getElementById('play-icon').textContent = '⏳';
   document.getElementById('play-label').textContent = '生成中...';
 
-  // iOSのAutoplay制限対策：
-  // ユーザー操作のタイミングでAudioContextを即座に作成・resumeしておく
   let audioCtx = null;
   try {
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -916,58 +984,86 @@ async function playOpenAITTS(text, apiKey, speed) {
 
     const arrayBuffer = await res.arrayBuffer();
 
-    // AudioContextを使って再生（iOSでAutoplay制限を回避）
+    // base64に変換してキャッシュ保存
+    const base64 = arrayBufferToBase64(arrayBuffer);
+    saveAudioCache(cacheKey, base64);
+
+    document.getElementById('play-icon').textContent = '⏸';
+    document.getElementById('play-label').textContent = 'Pause';
+
     if (audioCtx) {
-      const decoded = await audioCtx.decodeAudioData(arrayBuffer);
-      const source = audioCtx.createBufferSource();
-      source.buffer = decoded;
-      source.playbackRate.value = 1.0; // speed はAPIに渡し済み
-      source.connect(audioCtx.destination);
-
-      document.getElementById('play-icon').textContent = '⏸';
-      document.getElementById('play-label').textContent = 'Pause';
-
-      const duration = decoded.duration;
-      progressInterval = setInterval(() => {
-        const elapsed = audioCtx.currentTime - startTime;
-        const pct = Math.min((elapsed / duration) * 100, 100);
-        document.getElementById('progress-bar').style.width = pct + '%';
-        if (elapsed >= duration) stopProgress();
-      }, 200);
-
-      const startTime = audioCtx.currentTime;
-      source.start(0);
-
-      // 停止用に保持
-      currentAudio = { pause: () => { source.stop(); audioCtx.close(); } };
-      source.onended = () => stopProgress();
-
+      await playWithAudioContext(audioCtx, arrayBuffer);
     } else {
-      // AudioContext非対応の場合はBlobURLフォールバック
-      const blob = new Blob([arrayBuffer], { type: 'audio/mpeg' });
-      const url = URL.createObjectURL(blob);
-      currentAudio = new Audio(url);
-
-      document.getElementById('play-icon').textContent = '⏸';
-      document.getElementById('play-label').textContent = 'Pause';
-
-      currentAudio.onended = () => { stopProgress(); URL.revokeObjectURL(url); };
-      currentAudio.onerror = () => stopProgress();
-      currentAudio.onloadedmetadata = () => {
-        const duration = currentAudio.duration;
-        progressInterval = setInterval(() => {
-          if (!currentAudio) return;
-          document.getElementById('progress-bar').style.width =
-            Math.min((currentAudio.currentTime / duration) * 100, 100) + '%';
-        }, 200);
-      };
-      await currentAudio.play();
+      await playBase64Audio(base64);
     }
 
   } catch(e) {
     stopProgress();
     alert(`音声生成エラー：${e.message}`);
   }
+}
+
+function arrayBufferToBase64(buffer) {
+  let binary = '';
+  const bytes = new Uint8Array(buffer);
+  for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
+  return btoa(binary);
+}
+
+function base64ToArrayBuffer(base64) {
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return bytes.buffer;
+}
+
+async function playBase64Audio(base64) {
+  try {
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    await audioCtx.resume();
+    const arrayBuffer = base64ToArrayBuffer(base64);
+    await playWithAudioContext(audioCtx, arrayBuffer);
+  } catch(e) {
+    // AudioContextが使えない場合はBlobフォールバック
+    const binary = atob(base64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    const blob = new Blob([bytes], { type: 'audio/mpeg' });
+    const url = URL.createObjectURL(blob);
+    currentAudio = new Audio(url);
+    currentAudio.onended = () => { stopProgress(true); URL.revokeObjectURL(url); };
+    currentAudio.onerror = () => stopProgress();
+    currentAudio.onloadedmetadata = () => {
+      const duration = currentAudio.duration;
+      progressInterval = setInterval(() => {
+        if (!currentAudio) return;
+        document.getElementById('progress-bar').style.width =
+          Math.min((currentAudio.currentTime / duration) * 100, 100) + '%';
+      }, 200);
+    };
+    await currentAudio.play();
+  }
+}
+
+async function playWithAudioContext(audioCtx, arrayBuffer) {
+  const decoded = await audioCtx.decodeAudioData(arrayBuffer);
+  const source = audioCtx.createBufferSource();
+  source.buffer = decoded;
+  source.connect(audioCtx.destination);
+
+  const duration = decoded.duration;
+  const startTime = audioCtx.currentTime;
+
+  progressInterval = setInterval(() => {
+    const elapsed = audioCtx.currentTime - startTime;
+    const pct = Math.min((elapsed / duration) * 100, 100);
+    document.getElementById('progress-bar').style.width = pct + '%';
+    if (elapsed >= duration) stopProgress(true);
+  }, 200);
+
+  currentAudio = { pause: () => { try { source.stop(); audioCtx.close(); } catch(e){} } };
+  source.onended = () => stopProgress(true);
+  source.start(0);
 }
 
 function playBrowserTTS(text, speed) {
@@ -986,15 +1082,28 @@ function playBrowserTTS(text, speed) {
       document.getElementById('progress-bar').style.width = Math.round((prog / totalChars) * 100) + '%';
     }, 500);
   };
-  utterance.onend = utterance.onerror = () => stopProgress();
+  utterance.onend = utterance.onerror = () => stopProgress(true);
   speechSynthesis.speak(utterance);
 }
 
-function stopProgress() {
+function stopProgress(fromEnded = false) {
   isSpeaking = false; clearInterval(progressInterval);
   document.getElementById('play-icon').textContent = '▶';
   document.getElementById('play-label').textContent = 'Play';
   document.getElementById('progress-bar').style.width = '0%';
+
+  // 繰り返し再生
+  if (fromEnded && isRepeat) {
+    setTimeout(() => {
+      const engine = document.getElementById('tts-engine-select').value;
+      if (engine === 'openai') {
+        const ok = getOpenAIKey();
+        if (ok && lastPlayText) playOpenAITTS(lastPlayText, ok, lastPlaySpeed);
+      } else {
+        if (lastPlayText) playBrowserTTS(lastPlayText, lastPlaySpeed);
+      }
+    }, 800);
+  }
 }
 
 // ── Init ──
