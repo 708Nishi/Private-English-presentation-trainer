@@ -187,8 +187,18 @@
     display:flex;align-items:flex-start;justify-content:space-between;gap:8px;}
   .vocab-item:last-child{border-bottom:none;}
   .vocab-word{font-size:14px;font-weight:500;color:var(--purple-deeper);}
-  .vocab-meaning{font-size:13px;color:var(--text-2);line-height:1.6;margin-top:2px;}
+  .vocab-pron{font-size:12px;color:var(--text-3);font-family:'DM Mono',monospace;margin-top:2px;}
+  .vocab-meaning{font-size:13px;color:var(--text-2);line-height:1.6;margin-top:4px;}
   .vocab-example{font-size:12px;color:var(--text-3);font-style:italic;margin-top:3px;}
+  .vocab-youglish{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:500;
+    color:var(--purple-dark);text-decoration:none;margin-top:6px;
+    padding:3px 8px;border:1px solid var(--purple-border);border-radius:20px;background:var(--purple-light);}
+  .vocab-youglish:hover{background:var(--purple-mid);}
+  .fc-pron{font-size:13px;color:var(--purple-dark);font-family:'DM Mono',monospace;margin-top:6px;}
+  .fc-youglish{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:500;
+    color:var(--purple-dark);text-decoration:none;margin-top:10px;
+    padding:3px 10px;border:1.5px solid var(--purple-border);border-radius:20px;background:rgba(255,255,255,0.7);}
+  .fc-youglish:hover{background:var(--purple-mid);}
   .vocab-fc-wrap{perspective:900px;max-width:520px;margin:0 auto;}
   .vocab-fc{width:100%;height:180px;position:relative;transform-style:preserve-3d;
     transition:transform 0.45s cubic-bezier(0.4,0,0.2,1);cursor:pointer;}
@@ -431,6 +441,8 @@
             <div class="fc-face fc-front">
               <div class="fc-sublabel">word</div>
               <div class="fc-phrase" id="vfc-word">—</div>
+              <div class="fc-pron" id="vfc-pron"></div>
+              <a class="fc-youglish" id="vfc-youglish" href="#" target="_blank" rel="noopener" onclick="event.stopPropagation()">🔊 YouGlish</a>
             </div>
             <div class="fc-face fc-back">
               <div class="fc-sublabel">meaning & example</div>
@@ -746,7 +758,8 @@ async function addVocab(){
 
   const prompt=`You are an English vocabulary tutor for a Japanese medical researcher.
 Look up the following English word/phrase and provide a JSON object (no markdown, no backticks):
-{"word":"${word}","meaning":"日本語で：意味と医学・学術での使い方を2〜3文で説明","example":"A natural English example sentence using this word in an academic or medical context"}`;
+{"word":"${word}","pronunciation":"/IPA symbols here/","meaning":"日本語で：意味と医学・学術での使い方を2〜3文で説明","example":"A natural English example sentence using this word in an academic or medical context"}
+Include IPA pronunciation symbols in the pronunciation field (e.g. /brɒŋkiˈɛktəsɪs/).`;
 
   try{
     const res=await fetch('https://api.anthropic.com/v1/messages',{
@@ -798,13 +811,16 @@ function renderVocabList(){
 
   [...vocabList].reverse().forEach((v,ri)=>{
     const i=vocabList.length-1-ri;
+    const youglishUrl=`https://youglish.com/pronounce/${encodeURIComponent(v.word)}/english`;
     const d=document.createElement('div'); d.className='vocab-item';
     d.innerHTML=`<div style="flex:1;">
       <div class="vocab-word">${v.word}</div>
+      ${v.pronunciation?`<div class="vocab-pron">${v.pronunciation}</div>`:''}
       <div class="vocab-meaning">${v.meaning}</div>
       <div class="vocab-example">"${v.example}"</div>
+      <a class="vocab-youglish" href="${youglishUrl}" target="_blank" rel="noopener">🔊 YouGlish で発音を確認</a>
     </div>
-    <button class="btn btn-danger-sm" onclick="deleteVocab(${i})">削除</button>`;
+    <button class="btn btn-danger-sm" onclick="deleteVocab(${i})" style="flex-shrink:0;">削除</button>`;
     listEl.appendChild(d);
   });
 }
@@ -834,6 +850,9 @@ function showVocabCard(i){
   vocabFlipped=false; document.getElementById('vocab-flashcard').classList.remove('flipped');
   const v=vocabList[i];
   document.getElementById('vfc-word').textContent=v.word;
+  document.getElementById('vfc-pron').textContent=v.pronunciation||'';
+  const youglishUrl=`https://youglish.com/pronounce/${encodeURIComponent(v.word)}/english`;
+  document.getElementById('vfc-youglish').href=youglishUrl;
   document.getElementById('vfc-meaning').textContent=v.meaning;
   document.getElementById('vfc-example').textContent='"'+v.example+'"';
   document.getElementById('vfc-counter').textContent=`${i+1} / ${vocabList.length}`;
