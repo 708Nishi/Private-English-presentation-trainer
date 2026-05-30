@@ -6,387 +6,290 @@
 <title>Weekly Presentation Trainer</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;1,400&family=DM+Mono&display=swap');
-
-  /* =====================
-     CONFIG NOTICE:
-     Search for "YOUR_" to find all places you need to fill in your keys.
-     ===================== */
-
   :root {
-    --purple: #7F77DD;
-    --purple-dark: #534AB7;
-    --purple-deeper: #3C3489;
-    --purple-light: #EEEDFE;
-    --purple-mid: #CECBF6;
-    --purple-border: #AFA9EC;
-    --bg: #F5F4F0;
-    --card: #FFFFFF;
-    --text: #1A1A1A;
-    --text-2: #555;
-    --text-3: #999;
-    --border: #1A1A1A;
-    --border-light: #D5D3DC;
-    --radius: 10px;
-    --warn: #BA7517;
-    --danger: #C0392B;
-    --danger-bg: #FEF0EE;
-    --success: #1A7A4A;
-    --success-bg: #EDFAF3;
+    --purple:#7F77DD; --purple-dark:#534AB7; --purple-deeper:#3C3489;
+    --purple-light:#EEEDFE; --purple-mid:#CECBF6; --purple-border:#AFA9EC;
+    --bg:#F5F4F0; --card:#FFFFFF; --text:#1A1A1A; --text-2:#555; --text-3:#999;
+    --border:#1A1A1A; --border-light:#D5D3DC; --radius:10px;
+    --warn:#BA7517; --danger:#C0392B; --danger-bg:#FEF0EE;
+    --success:#1A7A4A; --success-bg:#EDFAF3;
   }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+  .page{max-width:680px;margin:0 auto;padding:2rem 1.25rem 5rem;}
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-  }
-
-  /* ── Layout ── */
-  .page { max-width: 680px; margin: 0 auto; padding: 2rem 1.25rem 5rem; }
+  /* ── Nav tabs ── */
+  .nav{display:flex;gap:4px;background:var(--card);border:1.5px solid var(--border);
+    border-radius:12px;padding:4px;margin-bottom:1.5rem;}
+  .nav-tab{flex:1;font-size:13px;font-weight:500;padding:8px 4px;border:none;
+    border-radius:8px;background:transparent;color:var(--text-3);cursor:pointer;
+    font-family:'DM Sans',sans-serif;transition:all 0.15s;}
+  .nav-tab.active{background:var(--purple);color:#fff;}
 
   /* ── Header ── */
-  .header { margin-bottom: 2rem; }
-  .week-badge {
-    display: inline-flex; align-items: center; gap: 6px;
-    font-size: 12px; font-weight: 500;
-    color: var(--purple-deeper); background: var(--purple-light);
-    border: 1.5px solid var(--purple-border);
-    border-radius: 20px; padding: 3px 12px; margin-bottom: 12px;
-  }
-  .header h1 { font-size: 22px; font-weight: 500; letter-spacing: -0.4px; }
-  .header p { font-size: 13px; color: var(--text-2); margin-top: 5px; }
+  .header{margin-bottom:1.5rem;}
+  .week-badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;
+    color:var(--purple-deeper);background:var(--purple-light);border:1.5px solid var(--purple-border);
+    border-radius:20px;padding:3px 12px;margin-bottom:10px;}
+  .header h1{font-size:21px;font-weight:500;letter-spacing:-0.4px;}
+  .header p{font-size:13px;color:var(--text-2);margin-top:4px;}
 
   /* ── Settings bar ── */
-  .settings-bar {
-    display: flex; align-items: center; gap: 8px;
-    margin-bottom: 1.5rem; flex-wrap: wrap;
-  }
-  .settings-bar span { font-size: 12px; color: var(--text-3); }
-  .key-status {
-    display: inline-flex; align-items: center; gap: 5px;
-    font-size: 12px; padding: 4px 10px;
-    border-radius: 20px; border: 1px solid;
-  }
-  .key-status.ok { color: var(--success); background: var(--success-bg); border-color: #9FE1CB; }
-  .key-status.ng { color: var(--danger); background: var(--danger-bg); border-color: #F5C6C4; }
-  .btn-settings {
-    font-size: 12px; padding: 5px 12px;
-    border: 1.5px solid var(--border); border-radius: 8px;
-    background: var(--card); color: var(--text-2); cursor: pointer;
-    font-family: 'DM Sans', sans-serif;
-  }
-  .btn-settings:hover { background: var(--bg); }
+  .settings-bar{display:flex;align-items:center;gap:6px;margin-bottom:1.25rem;flex-wrap:wrap;}
+  .key-status{display:inline-flex;align-items:center;font-size:11px;padding:3px 8px;
+    border-radius:20px;border:1px solid;}
+  .key-status.ok{color:var(--success);background:var(--success-bg);border-color:#9FE1CB;}
+  .key-status.ng{color:var(--danger);background:var(--danger-bg);border-color:#F5C6C4;}
+  .btn-settings{font-size:12px;padding:4px 10px;border:1.5px solid var(--border);
+    border-radius:8px;background:var(--card);color:var(--text-2);cursor:pointer;font-family:'DM Sans',sans-serif;}
+  .btn-settings:hover{background:var(--bg);}
 
   /* ── Modal ── */
-  .modal-overlay {
-    position: fixed; inset: 0; background: rgba(0,0,0,0.45);
-    display: flex; align-items: center; justify-content: center;
-    z-index: 100; padding: 1rem;
-  }
-  .modal {
-    background: var(--card); border: 2px solid var(--border);
-    border-radius: 14px; padding: 1.75rem;
-    width: 100%; max-width: 480px;
-  }
-  .modal h2 { font-size: 17px; font-weight: 500; margin-bottom: 4px; }
-  .modal p { font-size: 12px; color: var(--text-2); margin-bottom: 1.25rem; line-height: 1.6; }
-  .modal-field { margin-bottom: 1rem; }
-  .modal-label { font-size: 11px; font-weight: 500; letter-spacing: 0.07em; text-transform: uppercase; color: var(--text-3); margin-bottom: 6px; display: block; }
-  .modal-input {
-    width: 100%; font-family: 'DM Mono', monospace; font-size: 12px;
-    padding: 9px 12px; border: 2px solid var(--border); border-radius: 8px;
-    background: #FAFAF9; color: var(--text);
-  }
-  .modal-input:focus { outline: none; border-color: var(--purple); box-shadow: 0 0 0 3px var(--purple-light); }
-  .modal-row { display: flex; gap: 8px; justify-content: flex-end; margin-top: 1.25rem; }
-
-  /* ── Step ── */
-  .step-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-  .step-num {
-    width: 24px; height: 24px; border-radius: 50%;
-    background: var(--purple); color: #fff;
-    font-size: 12px; font-weight: 500;
-    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-  }
-  .step-label { font-size: 13px; font-weight: 500; }
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);
+    display:flex;align-items:center;justify-content:center;z-index:100;padding:1rem;}
+  .modal{background:var(--card);border:2px solid var(--border);border-radius:14px;
+    padding:1.75rem;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;}
+  .modal h2{font-size:17px;font-weight:500;margin-bottom:4px;}
+  .modal p{font-size:12px;color:var(--text-2);margin-bottom:1.25rem;line-height:1.6;}
+  .modal-field{margin-bottom:1rem;}
+  .modal-label{font-size:11px;font-weight:500;letter-spacing:0.07em;text-transform:uppercase;
+    color:var(--text-3);margin-bottom:6px;display:block;}
+  .modal-input{width:100%;font-family:'DM Mono',monospace;font-size:12px;
+    padding:9px 12px;border:2px solid var(--border);border-radius:8px;background:#FAFAF9;color:var(--text);}
+  .modal-input:focus{outline:none;border-color:var(--purple);box-shadow:0 0 0 3px var(--purple-light);}
+  .modal-row{display:flex;gap:8px;justify-content:flex-end;margin-top:1.25rem;}
 
   /* ── Card ── */
-  .card {
-    background: var(--card); border: 1.5px solid var(--border);
-    border-radius: var(--radius); padding: 1.25rem; margin-bottom: 1.5rem;
-  }
-  .card-head {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 1rem;
-  }
-  .card-title { font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 7px; }
+  .card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);
+    padding:1.25rem;margin-bottom:1.25rem;}
+  .card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;}
+  .card-title{font-size:14px;font-weight:500;display:flex;align-items:center;gap:7px;}
+  .tag{font-size:12px;font-weight:500;background:var(--purple-light);border:1px solid var(--purple-border);
+    color:var(--purple-deeper);border-radius:20px;padding:2px 10px;white-space:nowrap;}
+  .hint{background:var(--bg);border:1px solid var(--border-light);border-radius:8px;
+    padding:10px 14px;font-size:12px;color:var(--text-2);line-height:1.7;margin-bottom:12px;}
+  .divider{height:1px;background:var(--border-light);margin:1rem 0;}
 
-  /* ── Tags ── */
-  .tag {
-    font-size: 12px; font-weight: 500;
-    background: var(--purple-light); border: 1px solid var(--purple-border);
-    color: var(--purple-deeper); border-radius: 20px; padding: 2px 10px; white-space: nowrap;
-  }
+  /* ── Step ── */
+  .step-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+  .step-num{width:24px;height:24px;border-radius:50%;background:var(--purple);color:#fff;
+    font-size:12px;font-weight:500;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .step-label{font-size:13px;font-weight:500;}
 
-  /* ── Field ── */
-  .field-label {
-    font-size: 11px; font-weight: 500; letter-spacing: 0.07em;
-    text-transform: uppercase; color: var(--text-3); margin-bottom: 6px;
-  }
-  .hint {
-    background: var(--bg); border: 1px solid var(--border-light);
-    border-radius: 8px; padding: 10px 14px;
-    font-size: 12px; color: var(--text-2); line-height: 1.7; margin-bottom: 12px;
-  }
-
-  /* ── Textarea ── */
-  textarea {
-    width: 100%; font-family: 'DM Sans', sans-serif;
-    font-size: 14px; line-height: 1.8; color: var(--text);
-    background: #FAFAF9; border: 2px solid var(--border);
-    border-radius: 8px; padding: 12px 14px; resize: vertical;
-    transition: border-color 0.15s, box-shadow 0.15s;
-  }
-  textarea:focus { outline: none; border-color: var(--purple); box-shadow: 0 0 0 3px var(--purple-light); }
-  textarea::placeholder { color: var(--text-3); }
-  #script-input { min-height: 180px; }
-
-  .word-counter { font-size: 12px; color: var(--text-3); text-align: right; margin-top: 5px; }
-  .word-counter.warn { color: var(--warn); }
-  .divider { height: 1px; background: var(--border-light); margin: 1rem 0; }
+  /* ── Textarea / Input ── */
+  textarea,input[type=text]{width:100%;font-family:'DM Sans',sans-serif;font-size:14px;
+    line-height:1.8;color:var(--text);background:#FAFAF9;border:2px solid var(--border);
+    border-radius:8px;padding:10px 14px;transition:border-color 0.15s,box-shadow 0.15s;}
+  textarea{resize:vertical;}
+  textarea:focus,input[type=text]:focus{outline:none;border-color:var(--purple);box-shadow:0 0 0 3px var(--purple-light);}
+  textarea::placeholder,input::placeholder{color:var(--text-3);}
+  #script-input{min-height:180px;}
+  .word-counter{font-size:12px;color:var(--text-3);text-align:right;margin-top:5px;}
+  .word-counter.warn{color:var(--warn);}
 
   /* ── Buttons ── */
-  .btn {
-    display: inline-flex; align-items: center; gap: 6px;
-    border-radius: 8px; font-size: 13px; font-weight: 500;
-    cursor: pointer; font-family: 'DM Sans', sans-serif;
-    transition: all 0.15s;
-  }
-  .btn-outline {
-    padding: 6px 14px; background: transparent;
-    border: 1.5px solid var(--border); color: var(--text-2);
-  }
-  .btn-outline:hover { background: var(--bg); }
-  .btn-primary {
-    padding: 9px 22px; background: var(--purple);
-    border: none; color: #fff;
-  }
-  .btn-primary:hover { background: var(--purple-dark); }
-  .btn-primary:disabled { background: var(--border-light); cursor: not-allowed; }
-  .btn-play {
-    padding: 8px 18px; background: var(--purple-light);
-    border: 1.5px solid var(--purple-border); color: var(--purple-deeper); white-space: nowrap;
-  }
-  .btn-play:hover { background: var(--purple-mid); }
-  .btn-nav {
-    padding: 9px 20px; background: var(--card);
-    border: 1.5px solid var(--border); color: var(--text);
-  }
-  .btn-nav:hover { background: var(--bg); }
-  .btn-sm {
-    padding: 4px 10px; font-size: 12px;
-    background: transparent; border: 1px solid var(--border-light); color: var(--text-2);
-  }
-  .btn-sm:hover { background: var(--bg); }
-  .btn-repeat {
-    padding: 7px 11px; font-size: 15px;
-    background: transparent;
-    border: 1.5px solid var(--border-light);
-    border-radius: 8px; color: var(--text-3);
-    flex-shrink: 0; transition: all 0.15s;
-  }
-  .btn-repeat:hover { background: var(--bg); }
-  .btn-repeat.active {
-    background: var(--purple-light);
-    border-color: var(--purple-border);
-    color: var(--purple-deeper);
-  }
+  .btn{display:inline-flex;align-items:center;gap:6px;border-radius:8px;font-size:13px;
+    font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s;}
+  .btn-primary{padding:9px 22px;background:var(--purple);border:none;color:#fff;}
+  .btn-primary:hover{background:var(--purple-dark);}
+  .btn-primary:disabled{background:var(--border-light);cursor:not-allowed;}
+  .btn-outline{padding:6px 14px;background:transparent;border:1.5px solid var(--border);color:var(--text-2);}
+  .btn-outline:hover{background:var(--bg);}
+  .btn-play{padding:8px 18px;background:var(--purple-light);border:1.5px solid var(--purple-border);
+    color:var(--purple-deeper);white-space:nowrap;}
+  .btn-play:hover{background:var(--purple-mid);}
+  .btn-nav{padding:9px 20px;background:var(--card);border:1.5px solid var(--border);color:var(--text);}
+  .btn-nav:hover{background:var(--bg);}
+  .btn-sm{padding:4px 10px;font-size:12px;background:transparent;border:1px solid var(--border-light);color:var(--text-2);}
+  .btn-sm:hover{background:var(--bg);}
+  .btn-danger-sm{padding:4px 10px;font-size:12px;background:transparent;border:1px solid var(--danger);color:var(--danger);}
+  .btn-danger-sm:hover{background:var(--danger-bg);}
+  .btn-repeat{padding:7px 11px;font-size:15px;background:transparent;border:1.5px solid var(--border-light);
+    border-radius:8px;color:var(--text-3);flex-shrink:0;transition:all 0.15s;}
+  .btn-repeat:hover{background:var(--bg);}
+  .btn-repeat.active{background:var(--purple-light);border-color:var(--purple-border);color:var(--purple-deeper);}
+  .row{display:flex;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap;}
+  .ml-auto{margin-left:auto;}
 
-  .row { display: flex; align-items: center; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
-  .ml-auto { margin-left: auto; }
-
-  /* ── Saved script banner ── */
-  .saved-banner {
-    background: var(--success-bg); border: 1.5px solid #9FE1CB;
-    border-radius: 8px; padding: 10px 14px; margin-bottom: 12px;
-    font-size: 13px; color: var(--success);
-    display: flex; align-items: center; justify-content: space-between; gap: 8px;
-  }
-  .saved-banner-text { display: flex; align-items: center; gap: 6px; }
+  /* ── Saved banner ── */
+  .saved-banner{background:var(--success-bg);border:1.5px solid #9FE1CB;border-radius:8px;
+    padding:10px 14px;margin-bottom:12px;font-size:13px;color:var(--success);
+    display:flex;align-items:center;justify-content:space-between;gap:8px;}
 
   /* ── Script display ── */
-  .script-text { font-size: 14px; line-height: 1.9; color: var(--text); }
-  .script-text mark {
-    background: var(--purple-light);
-    color: var(--purple-deeper);
-    border-bottom: 2px solid var(--purple);
-    border-radius: 3px;
-    padding: 1px 2px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background 0.15s;
-  }
-  .script-text mark:hover { background: var(--purple-mid); }
+  .script-text{font-size:14px;line-height:1.9;color:var(--text);}
+  .script-text mark{background:var(--purple-light);color:var(--purple-deeper);
+    border-bottom:2px solid var(--purple);border-radius:3px;padding:1px 2px;
+    font-weight:500;cursor:pointer;transition:background 0.15s;}
+  .script-text mark:hover{background:var(--purple-mid);}
 
   /* ── TTS ── */
-  .tts-section {
-    margin-top: 1rem; padding-top: 1rem;
-    border-top: 1px solid var(--border-light);
-    display: flex; flex-direction: column; gap: 10px;
-  }
-  .tts-row { display: flex; align-items: center; gap: 8px; }
-  .tts-lbl { font-size: 11px; color: var(--text-3); white-space: nowrap; min-width: 26px; }
-  .prog-wrap { flex: 1; height: 4px; background: var(--bg); border-radius: 2px; overflow: hidden; min-width: 40px; }
-  .prog-bar { height: 100%; width: 0%; background: var(--purple); border-radius: 2px; transition: width 0.3s; }
-  select {
-    font-family: 'DM Sans', sans-serif; font-size: 12px; padding: 5px 8px;
-    border: 1.5px solid var(--border); border-radius: 8px;
-    background: var(--card); color: var(--text); cursor: pointer; flex: 1; min-width: 0;
-  }
-  select:focus { outline: none; border-color: var(--purple); }
-  .quality-pill {
-    font-size: 11px; font-weight: 500; color: var(--purple-deeper);
-    background: var(--purple-mid); border-radius: 20px; padding: 2px 10px;
-    white-space: nowrap; flex-shrink: 0;
-  }
+  .tts-section{margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border-light);
+    display:flex;flex-direction:column;gap:10px;}
+  .tts-row{display:flex;align-items:center;gap:8px;}
+  .tts-lbl{font-size:11px;color:var(--text-3);white-space:nowrap;min-width:34px;}
+  .prog-wrap{flex:1;height:4px;background:var(--bg);border-radius:2px;overflow:hidden;min-width:40px;}
+  .prog-bar{height:100%;width:0%;background:var(--purple);border-radius:2px;transition:width 0.3s;}
+  select{font-family:'DM Sans',sans-serif;font-size:12px;padding:5px 8px;
+    border:1.5px solid var(--border);border-radius:8px;background:var(--card);
+    color:var(--text);cursor:pointer;flex:1;min-width:0;}
+  select:focus{outline:none;border-color:var(--purple);}
+  .quality-pill{font-size:11px;font-weight:500;color:var(--purple-deeper);background:var(--purple-mid);
+    border-radius:20px;padding:2px 10px;white-space:nowrap;flex-shrink:0;}
 
-  /* ── Tabs ── */
-  .tabs {
-    display: flex; gap: 4px; background: var(--bg);
-    border: 1.5px solid var(--border-light); border-radius: 10px;
-    padding: 4px; margin-bottom: 1rem;
-  }
-  .tab {
-    flex: 1; font-size: 13px; font-weight: 500; padding: 7px;
-    border: none; border-radius: 7px; background: transparent;
-    color: var(--text-3); cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s;
-  }
-  .tab.active { background: var(--card); color: var(--text); border: 1.5px solid var(--border); }
+  /* ── Tabs (flashcard/list) ── */
+  .tabs{display:flex;gap:4px;background:var(--bg);border:1.5px solid var(--border-light);
+    border-radius:10px;padding:4px;margin-bottom:1rem;}
+  .tab{flex:1;font-size:13px;font-weight:500;padding:7px;border:none;border-radius:7px;
+    background:transparent;color:var(--text-3);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s;}
+  .tab.active{background:var(--card);color:var(--text);border:1.5px solid var(--border);}
 
   /* ── Flashcard ── */
-  .fc-wrap { perspective: 900px; max-width: 520px; margin: 0 auto; }
-  .fc {
-    width: 100%; height: 210px; position: relative;
-    transform-style: preserve-3d; transition: transform 0.45s cubic-bezier(0.4,0,0.2,1); cursor: pointer;
-  }
-  .fc.flipped { transform: rotateY(180deg); }
-  .fc-face {
-    position: absolute; inset: 0; backface-visibility: hidden;
-    border-radius: var(--radius); display: flex; flex-direction: column;
-    align-items: center; justify-content: center; padding: 1.5rem; text-align: center;
-  }
-  .fc-front { background: var(--purple-light); border: 2px solid var(--purple); }
-  .fc-back { background: #FAFAF9; border: 2px solid var(--border); transform: rotateY(180deg); }
-  .fc-sublabel { font-size: 10px; font-weight: 500; letter-spacing: 0.09em; text-transform: uppercase; margin-bottom: 10px; }
-  .fc-front .fc-sublabel { color: var(--purple-dark); }
-  .fc-back .fc-sublabel { color: var(--text-3); }
-  .fc-phrase { font-size: 16px; font-weight: 500; color: var(--purple-deeper); line-height: 1.4; }
-  .fc-meaning { font-size: 13px; color: var(--text-2); line-height: 1.65; }
-  .fc-example { font-size: 12px; color: var(--text-3); font-style: italic; margin-top: 8px; line-height: 1.5; }
-  .fc-hint { font-size: 12px; color: var(--text-3); text-align: center; margin-top: 8px; }
-  .fc-nav { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 1rem; }
-  .fc-count { font-size: 13px; color: var(--text-2); min-width: 50px; text-align: center; }
+  .fc-wrap{perspective:900px;max-width:520px;margin:0 auto;}
+  .fc{width:100%;height:210px;position:relative;transform-style:preserve-3d;
+    transition:transform 0.45s cubic-bezier(0.4,0,0.2,1);cursor:pointer;}
+  .fc.flipped{transform:rotateY(180deg);}
+  .fc-face{position:absolute;inset:0;backface-visibility:hidden;border-radius:var(--radius);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.5rem;text-align:center;}
+  .fc-front{background:var(--purple-light);border:2px solid var(--purple);}
+  .fc-back{background:#FAFAF9;border:2px solid var(--border);transform:rotateY(180deg);}
+  .fc-sublabel{font-size:10px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;margin-bottom:10px;}
+  .fc-front .fc-sublabel{color:var(--purple-dark);}
+  .fc-back .fc-sublabel{color:var(--text-3);}
+  .fc-phrase{font-size:16px;font-weight:500;color:var(--purple-deeper);line-height:1.4;}
+  .fc-meaning{font-size:13px;color:var(--text-2);line-height:1.65;}
+  .fc-example{font-size:12px;color:var(--text-3);font-style:italic;margin-top:8px;line-height:1.5;}
+  .fc-hint{font-size:12px;color:var(--text-3);text-align:center;margin-top:8px;}
+  .fc-nav{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:1rem;}
+  .fc-count{font-size:13px;color:var(--text-2);min-width:50px;text-align:center;}
 
-  /* ── List view ── */
-  .phrase-item { padding: 13px 0; border-bottom: 1px solid var(--border-light); }
-  .phrase-item:last-child { border-bottom: none; }
-  .phrase-pill {
-    display: inline-block; font-size: 13px; font-weight: 500;
-    color: var(--purple-deeper); background: var(--purple-light);
-    border: 1.5px solid var(--purple-border); border-radius: 8px;
-    padding: 3px 10px; margin-bottom: 6px;
-  }
-  .phrase-meaning { font-size: 13px; color: var(--text-2); line-height: 1.65; margin-bottom: 4px; }
-  .phrase-example { font-size: 12px; color: var(--text-3); font-style: italic; }
+  /* ── Phrase list ── */
+  .phrase-item{padding:13px 0;border-bottom:1px solid var(--border-light);}
+  .phrase-item:last-child{border-bottom:none;}
+  .phrase-pill{display:inline-block;font-size:13px;font-weight:500;color:var(--purple-deeper);
+    background:var(--purple-light);border:1.5px solid var(--purple-border);
+    border-radius:8px;padding:3px 10px;margin-bottom:6px;}
+  .phrase-meaning{font-size:13px;color:var(--text-2);line-height:1.65;margin-bottom:4px;}
+  .phrase-example{font-size:12px;color:var(--text-3);font-style:italic;}
 
-  /* ── Misc ── */
-  .error-box {
-    font-size: 13px; color: var(--danger); background: var(--danger-bg);
-    border: 1px solid #F5C6C4; border-radius: 8px; padding: 10px 14px; margin-top: 8px;
-  }
-  .loading-box {
-    text-align: center; padding: 2rem 1rem;
-    font-size: 13px; color: var(--text-3);
-  }
-  .hidden { display: none; }
+  /* ── Archive ── */
+  .archive-item{padding:12px 14px;border:1.5px solid var(--border-light);border-radius:8px;
+    margin-bottom:8px;cursor:pointer;transition:all 0.15s;}
+  .archive-item:hover{border-color:var(--purple-border);background:var(--purple-light);}
+  .archive-date{font-size:11px;color:var(--text-3);margin-bottom:4px;}
+  .archive-summary{font-size:13px;color:var(--text);line-height:1.5;}
+  .archive-meta{font-size:11px;color:var(--text-3);margin-top:4px;}
 
-  /* ── Responsive ── */
-  @media (max-width: 560px) {
-    .page { padding: 1.25rem 1rem 3rem; }
-    .header h1 { font-size: 18px; }
-    textarea { font-size: 15px; }
-    #script-input { min-height: 160px; }
-    .btn-primary { width: 100%; justify-content: center; padding: 11px; }
-    .ml-auto { margin-left: 0; width: 100%; }
-    .fc { height: 230px; }
-    .fc-phrase { font-size: 15px; }
-    .btn-nav { padding: 11px 16px; flex: 1; justify-content: center; }
-    .fc-nav { gap: 8px; width: 100%; }
-    .tts-row { flex-wrap: wrap; }
-    .tab { font-size: 12px; padding: 8px 4px; }
-    .modal { padding: 1.25rem; }
+  /* ── Vocabulary ── */
+  .vocab-input-row{display:flex;gap:8px;margin-bottom:1rem;}
+  .vocab-input-row input{flex:1;}
+  .vocab-item{padding:12px 0;border-bottom:1px solid var(--border-light);
+    display:flex;align-items:flex-start;justify-content:space-between;gap:8px;}
+  .vocab-item:last-child{border-bottom:none;}
+  .vocab-word{font-size:14px;font-weight:500;color:var(--purple-deeper);}
+  .vocab-meaning{font-size:13px;color:var(--text-2);line-height:1.6;margin-top:2px;}
+  .vocab-example{font-size:12px;color:var(--text-3);font-style:italic;margin-top:3px;}
+  .vocab-fc-wrap{perspective:900px;max-width:520px;margin:0 auto;}
+  .vocab-fc{width:100%;height:180px;position:relative;transform-style:preserve-3d;
+    transition:transform 0.45s cubic-bezier(0.4,0,0.2,1);cursor:pointer;}
+  .vocab-fc.flipped{transform:rotateY(180deg);}
+
+  /* ── Error / misc ── */
+  .error-box{font-size:13px;color:var(--danger);background:var(--danger-bg);
+    border:1px solid #F5C6C4;border-radius:8px;padding:10px 14px;margin-top:8px;}
+  .empty-msg{text-align:center;padding:2rem 1rem;font-size:13px;color:var(--text-3);}
+  .hidden{display:none;}
+
+  @media(max-width:560px){
+    .page{padding:1.25rem 1rem 3rem;}
+    .header h1{font-size:18px;}
+    textarea,input[type=text]{font-size:15px;}
+    #script-input{min-height:160px;}
+    .btn-primary{width:100%;justify-content:center;padding:11px;}
+    .ml-auto{margin-left:0;width:100%;}
+    .fc{height:230px;} .fc-phrase{font-size:15px;}
+    .btn-nav{padding:11px 16px;flex:1;justify-content:center;}
+    .fc-nav{gap:8px;width:100%;}
+    .tts-row{flex-wrap:wrap;} select{min-width:0;}
+    .tab{font-size:12px;padding:8px 4px;}
+    .nav-tab{font-size:12px;padding:7px 2px;}
   }
 </style>
 </head>
 <body>
 <div class="page">
 
-  <!-- Settings Modal -->
-  <div class="modal-overlay hidden" id="settings-modal">
-    <div class="modal">
-      <h2>API設定</h2>
-      <p>キーはこのデバイスのブラウザ（localStorage）にのみ保存されます。外部には送信されません。</p>
-      <div class="modal-field">
-        <label class="modal-label">Anthropic API Key</label>
-        <input class="modal-input" type="password" id="input-anthropic-key" placeholder="sk-ant-..." autocomplete="off" />
-      </div>
-      <div class="modal-field">
-        <label class="modal-label">OpenAI API Key（音声読み上げ用）</label>
-        <input class="modal-input" type="password" id="input-openai-key" placeholder="sk-..." autocomplete="off" />
-      </div>
-      <div class="modal-field">
-        <label class="modal-label">GitHub Personal Access Token</label>
-        <input class="modal-input" type="password" id="input-github-token" placeholder="ghp_..." autocomplete="off" />
-      </div>
-      <div class="modal-row">
-        <button class="btn btn-outline" onclick="closeSettings()">キャンセル</button>
-        <button class="btn btn-primary" onclick="saveSettings()">保存</button>
-      </div>
+<!-- Settings Modal -->
+<div class="modal-overlay hidden" id="settings-modal">
+  <div class="modal">
+    <h2>⚙ API設定</h2>
+    <p>キーはこのデバイスのブラウザ（localStorage）にのみ保存されます。</p>
+    <div class="modal-field">
+      <label class="modal-label">Anthropic API Key</label>
+      <input class="modal-input" type="password" id="input-anthropic-key" placeholder="sk-ant-..." autocomplete="off"/>
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">OpenAI API Key（音声読み上げ用）</label>
+      <input class="modal-input" type="password" id="input-openai-key" placeholder="sk-..." autocomplete="off"/>
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">GitHub Personal Access Token</label>
+      <input class="modal-input" type="password" id="input-github-token" placeholder="ghp_..." autocomplete="off"/>
+    </div>
+    <div class="modal-row">
+      <button class="btn btn-outline" onclick="closeSettings()">キャンセル</button>
+      <button class="btn btn-primary" onclick="saveSettings()">保存</button>
     </div>
   </div>
+</div>
 
-  <!-- Header -->
-  <div class="header">
-    <div class="week-badge">📅 <span id="week-label"></span></div>
-    <h1>Weekly Presentation Trainer</h1>
-    <p>スクリプト入力 · リスニング · フレーズ復習</p>
+<!-- Archive viewer Modal -->
+<div class="modal-overlay hidden" id="archive-modal">
+  <div class="modal">
+    <h2>📦 アーカイブ</h2>
+    <p>過去のスクリプトを選択すると表示します。</p>
+    <div id="archive-list"></div>
+    <div class="modal-row">
+      <button class="btn btn-outline" onclick="closeArchiveModal()">閉じる</button>
+    </div>
   </div>
+</div>
 
-  <!-- Settings bar -->
-  <div class="settings-bar">
-    <span id="key-status-anthropic" class="key-status ng">Anthropic: 未設定</span>
-    <span id="key-status-openai" class="key-status ng">OpenAI: 未設定</span>
-    <span id="key-status-github" class="key-status ng">GitHub: 未設定</span>
-    <button class="btn-settings" onclick="openSettings()">⚙ APIキーを設定</button>
-  </div>
+<!-- Header -->
+<div class="header">
+  <div class="week-badge">📅 <span id="week-label"></span></div>
+  <h1>Weekly Presentation Trainer</h1>
+  <p>スクリプト · リスニング · フレーズ · 単語帳</p>
+</div>
 
-  <!-- View: Input -->
+<!-- Settings bar -->
+<div class="settings-bar">
+  <span id="key-status-anthropic" class="key-status ng">Anthropic: 未設定</span>
+  <span id="key-status-openai" class="key-status ng">OpenAI: 未設定</span>
+  <span id="key-status-github" class="key-status ng">GitHub: 未設定</span>
+  <button class="btn-settings" onclick="openSettings()">⚙ APIキーを設定</button>
+</div>
+
+<!-- Nav -->
+<div class="nav">
+  <button class="nav-tab active" onclick="switchPage('script', this)">📄 スクリプト</button>
+  <button class="nav-tab" onclick="switchPage('vocab', this)">📚 単語帳</button>
+</div>
+
+<!-- ===================== PAGE: SCRIPT ===================== -->
+<div id="page-script">
+
+  <!-- Input view -->
   <div id="view-input">
-
-    <!-- Saved script banner -->
     <div id="saved-banner" class="saved-banner hidden">
-      <div class="saved-banner-text">
-        ✅ <span id="saved-script-info">保存済みのスクリプトがあります</span>
+      <span>✅ <span id="saved-script-info"></span></span>
+      <div style="display:flex;gap:6px;flex-shrink:0;">
+        <button class="btn btn-sm" onclick="openArchiveModal()">📦 アーカイブ</button>
+        <button class="btn btn-sm" onclick="loadSavedData()">読み込む</button>
       </div>
-      <button class="btn btn-sm" onclick="loadSavedData()">読み込む</button>
     </div>
 
-    <div class="step-row">
-      <div class="step-num">1</div>
-      <div class="step-label">スクリプトを入力する</div>
-    </div>
+    <div class="step-row"><div class="step-num">1</div><div class="step-label">スクリプトを入力する</div></div>
     <div class="card">
       <div class="card-head">
         <div class="card-title">📄 Presentation script</div>
@@ -396,32 +299,24 @@
       <div class="word-counter" id="word-hint">目安：280〜320語（約2〜2.5分）</div>
     </div>
 
-    <div class="step-row">
-      <div class="step-num">2</div>
-      <div class="step-label">フレーズを自動抽出して保存する</div>
-    </div>
+    <div class="step-row"><div class="step-num">2</div><div class="step-label">フレーズを自動抽出して保存する</div></div>
     <div class="card">
-      <div class="hint">
-        「抽出して保存」を押すと、Claude APIがスクリプトからキーフレーズを自動抽出し、GitHub Gistに保存します。PC・スマートフォンどちらからでも読み込めます。
-      </div>
+      <div class="hint">「抽出して保存」を押すと、Claudeがキーフレーズを自動抽出しGistに保存します。<strong>現在のスクリプトは自動的にアーカイブされます。</strong></div>
       <div id="extract-error" class="error-box hidden"></div>
-      <div class="row">
-        <div class="ml-auto">
-          <button class="btn btn-primary" id="extract-btn" onclick="extractAndSave()">
-            ✨ 抽出して保存
-          </button>
-        </div>
-      </div>
+      <div class="row"><div class="ml-auto">
+        <button class="btn btn-primary" id="extract-btn" onclick="extractAndSave()">✨ 抽出して保存</button>
+      </div></div>
     </div>
   </div>
 
-  <!-- View: Result -->
+  <!-- Result view -->
   <div id="view-result" class="hidden">
     <div class="card">
       <div class="card-head">
         <div class="card-title">📄 Script</div>
-        <div style="display:flex;align-items:center;gap:8px;">
+        <div style="display:flex;align-items:center;gap:6px;">
           <span class="tag" id="word-count"></span>
+          <button class="btn btn-sm" onclick="openArchiveModal()">📦 アーカイブ</button>
           <button class="btn btn-sm" onclick="showInputView()">✏️ 更新</button>
         </div>
       </div>
@@ -429,8 +324,7 @@
       <div class="tts-section">
         <div class="tts-row">
           <button class="btn btn-play" id="play-btn" onclick="toggleTTS()">
-            <span id="play-icon">▶</span>
-            <span id="play-label">Play</span>
+            <span id="play-icon">▶</span><span id="play-label">Play</span>
           </button>
           <div class="prog-wrap"><div class="prog-bar" id="progress-bar"></div></div>
           <button class="btn btn-repeat" id="repeat-btn" onclick="toggleRepeat()" title="繰り返し再生">🔁</button>
@@ -445,12 +339,12 @@
         <div id="openai-voice-row" class="tts-row">
           <span class="tts-lbl">声</span>
           <select id="openai-voice-select">
-            <option value="alloy">Alloy（中性的）</option>
-            <option value="echo">Echo（男性的）</option>
-            <option value="fable">Fable（英国風）</option>
-            <option value="onyx">Onyx（低め・男性）</option>
-            <option value="nova" selected>Nova（女性的）</option>
-            <option value="shimmer">Shimmer（明るい女性）</option>
+            <option value="alloy">Alloy</option>
+            <option value="echo">Echo</option>
+            <option value="fable">Fable</option>
+            <option value="onyx">Onyx</option>
+            <option value="nova" selected>Nova</option>
+            <option value="shimmer">Shimmer</option>
           </select>
         </div>
         <div id="browser-voice-row" class="tts-row hidden">
@@ -477,10 +371,9 @@
         <span class="tag" id="phrase-total"></span>
       </div>
       <div class="tabs">
-        <button class="tab active" onclick="switchTab('flashcard', this)">Flashcard</button>
-        <button class="tab" onclick="switchTab('list', this)">List view</button>
+        <button class="tab active" onclick="switchTab('flashcard',this)">Flashcard</button>
+        <button class="tab" onclick="switchTab('list',this)">List view</button>
       </div>
-
       <div id="flashcard-view">
         <div class="fc-wrap">
           <div class="fc" id="flashcard" onclick="flipCard()">
@@ -502,607 +395,631 @@
           <button class="btn btn-nav" onclick="nextCard()">次へ →</button>
         </div>
       </div>
-
-      <div id="list-view" class="hidden">
-        <div id="phrase-list"></div>
-      </div>
+      <div id="list-view" class="hidden"><div id="phrase-list"></div></div>
     </div>
   </div>
-
 </div>
 
+<!-- ===================== PAGE: VOCAB ===================== -->
+<div id="page-vocab" class="hidden">
+  <div class="card">
+    <div class="card-head">
+      <div class="card-title">➕ 単語を追加する</div>
+    </div>
+    <div class="vocab-input-row">
+      <input type="text" id="vocab-word-input" placeholder="単語を入力（例：bronchiectasis）" onkeydown="if(event.key==='Enter')addVocab()"/>
+      <button class="btn btn-primary" id="vocab-add-btn" onclick="addVocab()" style="white-space:nowrap;padding:8px 16px;">追加</button>
+    </div>
+    <div id="vocab-error" class="error-box hidden"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <div class="card-title">📚 単語帳</div>
+      <span class="tag" id="vocab-total">0 words</span>
+    </div>
+    <div class="tabs">
+      <button class="tab active" onclick="switchVocabTab('flashcard',this)">Flashcard</button>
+      <button class="tab" onclick="switchVocabTab('list',this)">List view</button>
+    </div>
+
+    <div id="vocab-flashcard-view">
+      <div id="vocab-empty" class="empty-msg">単語を追加するとフラッシュカードが表示されます</div>
+      <div id="vocab-fc-area" class="hidden">
+        <div class="vocab-fc-wrap">
+          <div class="vocab-fc fc" id="vocab-flashcard" onclick="flipVocabCard()">
+            <div class="fc-face fc-front">
+              <div class="fc-sublabel">word</div>
+              <div class="fc-phrase" id="vfc-word">—</div>
+            </div>
+            <div class="fc-face fc-back">
+              <div class="fc-sublabel">meaning & example</div>
+              <div class="fc-meaning" id="vfc-meaning">—</div>
+              <div class="fc-example" id="vfc-example">—</div>
+            </div>
+          </div>
+        </div>
+        <div class="fc-hint">カードをタップして裏返す</div>
+        <div class="fc-nav">
+          <button class="btn btn-nav" onclick="prevVocabCard()">← 前へ</button>
+          <span class="fc-count" id="vfc-counter">0 / 0</span>
+          <button class="btn btn-nav" onclick="nextVocabCard()">次へ →</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="vocab-list-view" class="hidden">
+      <div id="vocab-list"></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- .page -->
 <script>
-// =====================================================
-// CONFIG — ここを書き換えてください
-// =====================================================
-const GIST_ID = '3e51837baf84554a02befb4235600ca6'; // ← 設定済み
+// ── Config ──
+const GIST_ID = '3e51837baf84554a02befb4235600ca6';
 
-// APIキーはlocalStorageから読み込みます（設定モーダルで入力）
-// =====================================================
-
-let phrases = [], cardIndex = 0, isFlipped = false;
-let utterance = null, isSpeaking = false, progressInterval = null;
-let availableVoices = [], selectedVoice = null;
-let isRepeat = false;
-let lastPlayText = '', lastPlayVoice = '', lastPlaySpeed = 1.0;
-
-function toggleRepeat() {
-  isRepeat = !isRepeat;
-  const btn = document.getElementById('repeat-btn');
-  btn.classList.toggle('active', isRepeat);
-  btn.title = isRepeat ? '繰り返し再生：ON' : '繰り返し再生：OFF';
-}
-
-function getAnthropicKey() { return localStorage.getItem('pt_anthropic_key') || ''; }
-function getGithubToken() { return localStorage.getItem('pt_github_token') || ''; }
-function getOpenAIKey() { return localStorage.getItem('pt_openai_key') || ''; }
+// ── State ──
+let phrases=[], cardIndex=0, isFlipped=false;
+let vocabList=[], vocabIndex=0, vocabFlipped=false;
+let utterance=null, isSpeaking=false, progressInterval=null;
+let availableVoices=[], selectedVoice=null;
+let isRepeat=false, lastPlayText='', lastPlaySpeed=1.0;
+let currentAudio=null;
 
 // ── Week label ──
-const now = new Date();
-const yr = now.getFullYear();
-const startOfYear = new Date(yr, 0, 1);
-const wk = Math.ceil(((now - startOfYear) / 86400000 + startOfYear.getDay() + 1) / 7);
-document.getElementById('week-label').textContent = `Week ${wk}, ${yr}`;
+const now=new Date(), yr=now.getFullYear();
+const soy=new Date(yr,0,1);
+const wk=Math.ceil(((now-soy)/86400000+soy.getDay()+1)/7);
+document.getElementById('week-label').textContent=`Week ${wk}, ${yr}`;
 
-// ── Key status UI ──
-function updateKeyStatus() {
-  const ak = getAnthropicKey();
-  const gh = getGithubToken();
-  const ok = getOpenAIKey();
-  const elA = document.getElementById('key-status-anthropic');
-  const elG = document.getElementById('key-status-github');
-  const elO = document.getElementById('key-status-openai');
-  if (ak) { elA.textContent = 'Anthropic ✓'; elA.className = 'key-status ok'; }
-  else { elA.textContent = 'Anthropic: 未設定'; elA.className = 'key-status ng'; }
-  if (gh) { elG.textContent = 'GitHub ✓'; elG.className = 'key-status ok'; }
-  else { elG.textContent = 'GitHub: 未設定'; elG.className = 'key-status ng'; }
-  if (ok) { elO.textContent = 'OpenAI ✓'; elO.className = 'key-status ok'; }
-  else { elO.textContent = 'OpenAI: 未設定'; elO.className = 'key-status ng'; }
+// ── Key helpers ──
+const getAK=()=>localStorage.getItem('pt_anthropic_key')||'';
+const getGH=()=>localStorage.getItem('pt_github_token')||'';
+const getOK=()=>localStorage.getItem('pt_openai_key')||'';
+
+function updateKeyStatus(){
+  const set=(id,val,label)=>{
+    const el=document.getElementById(id);
+    if(val){el.textContent=label+' ✓';el.className='key-status ok';}
+    else{el.textContent=label+': 未設定';el.className='key-status ng';}
+  };
+  set('key-status-anthropic',getAK(),'Anthropic');
+  set('key-status-openai',getOK(),'OpenAI');
+  set('key-status-github',getGH(),'GitHub');
 }
 
-// ── Settings modal ──
-function openSettings() {
-  document.getElementById('input-anthropic-key').value = getAnthropicKey();
-  document.getElementById('input-github-token').value = getGithubToken();
-  document.getElementById('input-openai-key').value = getOpenAIKey();
+// ── Settings ──
+function openSettings(){
+  document.getElementById('input-anthropic-key').value=getAK();
+  document.getElementById('input-openai-key').value=getOK();
+  document.getElementById('input-github-token').value=getGH();
   document.getElementById('settings-modal').classList.remove('hidden');
 }
-function closeSettings() { document.getElementById('settings-modal').classList.add('hidden'); }
-function saveSettings() {
-  const ak = document.getElementById('input-anthropic-key').value.trim();
-  const gh = document.getElementById('input-github-token').value.trim();
-  const ok = document.getElementById('input-openai-key').value.trim();
-  if (ak) localStorage.setItem('pt_anthropic_key', ak);
-  if (gh) localStorage.setItem('pt_github_token', gh);
-  if (ok) localStorage.setItem('pt_openai_key', ok);
-  updateKeyStatus();
-  closeSettings();
+function closeSettings(){document.getElementById('settings-modal').classList.add('hidden');}
+function saveSettings(){
+  const ak=document.getElementById('input-anthropic-key').value.trim();
+  const ok=document.getElementById('input-openai-key').value.trim();
+  const gh=document.getElementById('input-github-token').value.trim();
+  if(ak)localStorage.setItem('pt_anthropic_key',ak);
+  if(ok)localStorage.setItem('pt_openai_key',ok);
+  if(gh)localStorage.setItem('pt_github_token',gh);
+  updateKeyStatus(); closeSettings();
 }
 
-// ── Gist: load ──
-async function loadFromGist() {
-  const token = getGithubToken();
-  if (!token) return null;
-  try {
-    const res = await fetch(`https://api.github.com/gists/${GIST_ID}`, {
-      headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' }
+// ── Page nav ──
+function switchPage(name,btn){
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('page-script').classList.toggle('hidden',name!=='script');
+  document.getElementById('page-vocab').classList.toggle('hidden',name!=='vocab');
+}
+
+// ── Gist ──
+async function gistLoad(){
+  const token=getGH(); if(!token)return null;
+  try{
+    const res=await fetch(`https://api.github.com/gists/${GIST_ID}`,{
+      headers:{'Authorization':`token ${token}`,'Accept':'application/vnd.github.v3+json'}
     });
-    if (!res.ok) return null;
-    const data = await res.json();
-    const content = data.files['pt_data.json']?.content;
-    if (!content || content === '{}') return null;
+    if(!res.ok)return null;
+    const data=await res.json();
+    const content=data.files['pt_data.json']?.content;
+    if(!content||content==='{}')return null;
     return JSON.parse(content);
-  } catch(e) { return null; }
+  }catch(e){return null;}
 }
 
-// ── Gist: save ──
-async function saveToGist(payload) {
-  const token = getGithubToken();
-  if (!token) throw new Error('GitHub tokenが設定されていません');
-  const res = await fetch(`https://api.github.com/gists/${GIST_ID}`, {
-    method: 'PATCH',
-    headers: {
-      'Authorization': `token ${token}`,
-      'Accept': 'application/vnd.github.v3+json',
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ files: { 'pt_data.json': { content: JSON.stringify(payload) } } })
+async function gistSave(payload){
+  const token=getGH(); if(!token)throw new Error('GitHub tokenが設定されていません');
+  const res=await fetch(`https://api.github.com/gists/${GIST_ID}`,{
+    method:'PATCH',
+    headers:{'Authorization':`token ${token}`,'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'},
+    body:JSON.stringify({files:{'pt_data.json':{content:JSON.stringify(payload)}}})
   });
-  if (!res.ok) throw new Error('Gistへの保存に失敗しました');
+  if(!res.ok)throw new Error('Gistへの保存に失敗しました');
 }
 
-// ── Check saved data on load ──
-async function checkSavedData() {
-  const data = await loadFromGist();
-  if (data && data.script) {
-    const words = countWords(data.script);
-    const saved = document.getElementById('saved-banner');
-    document.getElementById('saved-script-info').textContent =
-      `保存済みスクリプトあり（${words} words · ${data.phrases?.length || 0} phrases）`;
-    saved.classList.remove('hidden');
+// ── Check saved ──
+async function checkSavedData(){
+  const data=await gistLoad();
+  if(!data)return;
+  if(data.current&&data.current.script){
+    const w=countWords(data.current.script);
+    const arcLen=(data.archives||[]).length;
+    document.getElementById('saved-script-info').textContent=
+      `保存済みスクリプトあり（${w} words · ${(data.current.phrases||[]).length} phrases · アーカイブ${arcLen}件）`;
+    document.getElementById('saved-banner').classList.remove('hidden');
+  }
+  // 単語帳も読み込み
+  if(data.vocabulary&&data.vocabulary.length){
+    vocabList=data.vocabulary;
+    renderVocabList();
+    if(vocabList.length)showVocabCard(0);
   }
 }
 
-function loadSavedData() {
-  loadFromGist().then(data => {
-    if (!data || !data.script) return;
-    renderResult(data.script, data.phrases || []);
+function loadSavedData(){
+  gistLoad().then(data=>{
+    if(!data||!data.current)return;
+    renderResult(data.current.script,data.current.phrases||[]);
   });
 }
+
+// ── Archive modal ──
+async function openArchiveModal(){
+  document.getElementById('archive-modal').classList.remove('hidden');
+  const listEl=document.getElementById('archive-list');
+  listEl.innerHTML='<div class="empty-msg">読み込み中...</div>';
+  const data=await gistLoad();
+  const archives=(data&&data.archives)||[];
+  if(!archives.length){listEl.innerHTML='<div class="empty-msg">アーカイブはまだありません</div>';return;}
+  listEl.innerHTML='';
+  // 新しい順
+  [...archives].reverse().forEach((a,i)=>{
+    const idx=archives.length-1-i;
+    const d=document.createElement('div');
+    d.className='archive-item';
+    const date=a.savedAt?new Date(a.savedAt).toLocaleDateString('ja-JP',{year:'numeric',month:'long',day:'numeric'}):'';
+    const summary=a.summary||(a.script?a.script.split('.')[0].slice(0,80)+'…':'');
+    d.innerHTML=`<div class="archive-date">${date}</div>
+      <div class="archive-summary">${summary}</div>
+      <div class="archive-meta">${countWords(a.script||'')} words · ${(a.phrases||[]).length} phrases</div>`;
+    d.onclick=()=>{renderResult(a.script,a.phrases||[]);closeArchiveModal();};
+    listEl.appendChild(d);
+  });
+}
+function closeArchiveModal(){document.getElementById('archive-modal').classList.add('hidden');}
 
 // ── Extract & Save ──
-async function extractAndSave() {
-  const script = document.getElementById('script-input').value.trim();
-  if (!script) {
-    showExtractError('スクリプトを入力してください。');
-    return;
-  }
-  const ak = getAnthropicKey();
-  if (!ak) { openSettings(); return; }
-  const gh = getGithubToken();
-  if (!gh) { openSettings(); return; }
+async function extractAndSave(){
+  const script=document.getElementById('script-input').value.trim();
+  if(!script){showExtractError('スクリプトを入力してください。');return;}
+  const ak=getAK(); if(!ak){openSettings();return;}
+  const gh=getGH(); if(!gh){openSettings();return;}
 
-  const btn = document.getElementById('extract-btn');
-  btn.disabled = true;
-  btn.textContent = '⏳ 抽出中...';
+  const btn=document.getElementById('extract-btn');
+  btn.disabled=true; btn.textContent='⏳ 抽出中...';
   document.getElementById('extract-error').classList.add('hidden');
 
-  const prompt = `You are an English presentation coach helping a Japanese academic learner.
-
+  const prompt=`You are an English presentation coach helping a Japanese academic learner.
 Analyze the following English presentation script and extract key phrases and sentence structures worth memorizing.
-
 Script:
 """
 ${script}
 """
-
 Respond ONLY with a raw JSON array. No explanation, no markdown, no backticks. Start with [ and end with ].
-
-[
-  {
-    "phrase": "the exact phrase or structure from the script",
-    "meaning": "日本語で：意味・使い方・どんな場面で使うかを2〜3文で説明",
-    "example": "A natural example sentence using this phrase"
-  }
-]
-
+[{"phrase":"...","meaning":"日本語で：意味・使い方・どんな場面で使うかを2〜3文で説明","example":"..."}]
 Extract 6-8 phrases. Focus on discourse markers, academic expressions, and reusable presentation phrases. Meanings in Japanese.`;
 
-  try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': ak,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
-      },
-      body: JSON.stringify({
-        model: 'claude-haiku-4-5',
-        max_tokens: 1500,
-        messages: [{ role: 'user', content: prompt }]
-      })
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':ak,
+        'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-haiku-4-5',max_tokens:1500,messages:[{role:'user',content:prompt}]})
     });
+    const apiData=await res.json();
+    if(apiData.type==='error')throw new Error(apiData.error?.message||'API error');
+    const raw=(apiData.content||[]).map(b=>b.text||'').join('').trim();
+    const match=raw.match(/\[[\s\S]*\]/);
+    if(!match)throw new Error('フレーズの抽出に失敗しました');
+    const extracted=JSON.parse(match[0]);
 
-    const apiData = await res.json();
-    if (apiData.type === 'error') throw new Error(apiData.error?.message || 'API error');
+    // 概要（冒頭1文）
+    const summary=script.split(/[.!?]/)[0].trim().slice(0,100)+(script.length>100?'…':'');
 
-    const raw = (apiData.content || []).map(b => b.text || '').join('').trim();
-    const match = raw.match(/\[[\s\S]*\]/);
-    if (!match) throw new Error('フレーズの抽出に失敗しました');
-    const extracted = JSON.parse(match[0]);
+    // 既存データ読み込み → アーカイブ追加 → 保存
+    const existing=await gistLoad()||{};
+    const archives=existing.archives||[];
+    if(existing.current&&existing.current.script){
+      archives.push({...existing.current, summary:existing.current.summary||summary});
+      // アーカイブは最大20件
+      if(archives.length>20)archives.shift();
+    }
+    const newData={
+      current:{script,phrases:extracted,savedAt:new Date().toISOString(),summary},
+      archives,
+      vocabulary:existing.vocabulary||[]
+    };
+    await gistSave(newData);
+    renderResult(script,extracted);
+  }catch(e){showExtractError(`エラー：${e.message}`);}
 
-    await saveToGist({ script, phrases: extracted, savedAt: new Date().toISOString() });
-    renderResult(script, extracted);
-
-  } catch(e) {
-    showExtractError(`エラー：${e.message}`);
-  }
-
-  btn.disabled = false;
-  btn.textContent = '✨ 抽出して保存';
+  btn.disabled=false; btn.textContent='✨ 抽出して保存';
 }
 
-function showExtractError(msg) {
-  const el = document.getElementById('extract-error');
-  el.textContent = msg; el.classList.remove('hidden');
+function showExtractError(msg){
+  const el=document.getElementById('extract-error');
+  el.textContent=msg; el.classList.remove('hidden');
 }
 
-// ── Highlight phrases in script ──
-function highlightScript(script, extractedPhrases) {
-  // エスケープしてからハイライト
-  let escaped = script
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
-
-  // フレーズを長い順に並び替えて部分一致の衝突を防ぐ
-  const sorted = [...extractedPhrases].sort((a, b) => b.phrase.length - a.phrase.length);
-
-  sorted.forEach((p, idx) => {
-    const phraseEscaped = p.phrase
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const re = new RegExp(`(${phraseEscaped})`, 'gi');
-    escaped = escaped.replace(re, `<mark data-idx="${idx}" onclick="jumpToCard(${idx})" title="${p.phrase}">$1</mark>`);
-  });
-
-  return escaped;
-}
-
-// ── Jump to flashcard from highlight ──
-function jumpToCard(idx) {
-  cardIndex = idx;
-  // List viewならFlashcardに切り替え
-  const fcView = document.getElementById('flashcard-view');
-  if (fcView.classList.contains('hidden')) {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.tab')[0].classList.add('active');
-    fcView.classList.remove('hidden');
-    document.getElementById('list-view').classList.add('hidden');
-  }
-  showCard(idx);
-  // フラッシュカードまでスクロール
-  document.getElementById('flashcard').scrollIntoView({ behavior: 'smooth', block: 'center' });
-}
-
-// ── Render result ──
-function renderResult(script, extractedPhrases) {
-  phrases = extractedPhrases;
+// ── Render script result ──
+function renderResult(script,extractedPhrases){
+  phrases=extractedPhrases;
   document.getElementById('view-input').classList.add('hidden');
   document.getElementById('view-result').classList.remove('hidden');
-
-  // ハイライト付きでスクリプトを表示
-  document.getElementById('script-display').innerHTML = highlightScript(script, extractedPhrases);
-
-  const words = countWords(script);
-  document.getElementById('word-count').textContent = `${words} words · ~${(words / 130).toFixed(1)} min`;
-  document.getElementById('phrase-total').textContent = `${phrases.length} phrases`;
-  cardIndex = 0; showCard(0);
-
-  const listEl = document.getElementById('phrase-list');
-  listEl.innerHTML = '';
-  phrases.forEach(p => {
-    const d = document.createElement('div');
-    d.className = 'phrase-item';
-    d.innerHTML = `<div class="phrase-pill">${p.phrase}</div><div class="phrase-meaning">${p.meaning}</div><div class="phrase-example">"${p.example}"</div>`;
+  document.getElementById('script-display').innerHTML=highlightScript(script,extractedPhrases);
+  const words=countWords(script);
+  document.getElementById('word-count').textContent=`${words} words · ~${(words/130).toFixed(1)} min`;
+  document.getElementById('phrase-total').textContent=`${phrases.length} phrases`;
+  cardIndex=0; showCard(0);
+  const listEl=document.getElementById('phrase-list');
+  listEl.innerHTML='';
+  phrases.forEach(p=>{
+    const d=document.createElement('div'); d.className='phrase-item';
+    d.innerHTML=`<div class="phrase-pill">${p.phrase}</div><div class="phrase-meaning">${p.meaning}</div><div class="phrase-example">"${p.example}"</div>`;
     listEl.appendChild(d);
   });
-  setTimeout(populateVoices, 300);
+  setTimeout(populateVoices,300);
 }
 
-function showInputView() {
+function showInputView(){
   speechSynthesis.cancel(); stopProgress();
   document.getElementById('view-result').classList.add('hidden');
   document.getElementById('view-input').classList.remove('hidden');
 }
 
-// ── Word counter ──
-function countWords(t) { return t.trim() === '' ? 0 : t.trim().split(/\s+/).length; }
+// ── Highlight ──
+function highlightScript(script,extractedPhrases){
+  let escaped=script.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const sorted=[...extractedPhrases].sort((a,b)=>b.phrase.length-a.phrase.length);
+  sorted.forEach((p,idx)=>{
+    const esc=p.phrase.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+    escaped=escaped.replace(new RegExp(`(${esc})`,'gi'),`<mark data-idx="${idx}" onclick="jumpToCard(${idx})" title="${p.phrase}">$1</mark>`);
+  });
+  return escaped;
+}
 
-document.getElementById('script-input').addEventListener('input', () => {
-  const w = countWords(document.getElementById('script-input').value);
-  document.getElementById('live-count').textContent = `${w} words`;
-  const hint = document.getElementById('word-hint');
-  if (w > 0 && (w < 250 || w > 380)) {
-    hint.className = 'word-counter warn';
-    hint.textContent = w < 250 ? '目安より少なめです（目標：280〜320語）' : '目安より多めです（目標：280〜320語）';
-  } else {
-    hint.className = 'word-counter';
-    hint.textContent = '目安：280〜320語（約2〜2.5分）';
+function jumpToCard(idx){
+  cardIndex=idx;
+  const fcView=document.getElementById('flashcard-view');
+  if(fcView.classList.contains('hidden')){
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.tab')[0].classList.add('active');
+    fcView.classList.remove('hidden');
+    document.getElementById('list-view').classList.add('hidden');
   }
+  showCard(idx);
+  document.getElementById('flashcard').scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+// ── Flashcard (phrases) ──
+function switchTab(name,btn){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('flashcard-view').classList.toggle('hidden',name!=='flashcard');
+  document.getElementById('list-view').classList.toggle('hidden',name!=='list');
+}
+function flipCard(){isFlipped=!isFlipped;document.getElementById('flashcard').classList.toggle('flipped',isFlipped);}
+function showCard(i){
+  if(!phrases.length)return;
+  isFlipped=false; document.getElementById('flashcard').classList.remove('flipped');
+  const p=phrases[i];
+  document.getElementById('fc-phrase').textContent=p.phrase;
+  document.getElementById('fc-meaning').textContent=p.meaning;
+  document.getElementById('fc-example').textContent='"'+p.example+'"';
+  document.getElementById('fc-counter').textContent=`${i+1} / ${phrases.length}`;
+}
+function nextCard(){cardIndex=(cardIndex+1)%phrases.length;showCard(cardIndex);}
+function prevCard(){cardIndex=(cardIndex-1+phrases.length)%phrases.length;showCard(cardIndex);}
+
+// ── Word counter ──
+function countWords(t){return t.trim()===''?0:t.trim().split(/\s+/).length;}
+document.getElementById('script-input').addEventListener('input',()=>{
+  const w=countWords(document.getElementById('script-input').value);
+  document.getElementById('live-count').textContent=`${w} words`;
+  const hint=document.getElementById('word-hint');
+  if(w>0&&(w<250||w>380)){hint.className='word-counter warn';hint.textContent=w<250?'目安より少なめです（目標：280〜320語）':'目安より多めです（目標：280〜320語）';}
+  else{hint.className='word-counter';hint.textContent='目安：280〜320語（約2〜2.5分）';}
 });
 
-// ── Flashcard ──
-function switchTab(name, btn) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  btn.classList.add('active');
-  document.getElementById('flashcard-view').classList.toggle('hidden', name !== 'flashcard');
-  document.getElementById('list-view').classList.toggle('hidden', name !== 'list');
-}
-function flipCard() {
-  isFlipped = !isFlipped;
-  document.getElementById('flashcard').classList.toggle('flipped', isFlipped);
-}
-function showCard(i) {
-  if (!phrases.length) return;
-  isFlipped = false;
-  document.getElementById('flashcard').classList.remove('flipped');
-  const p = phrases[i];
-  document.getElementById('fc-phrase').textContent = p.phrase;
-  document.getElementById('fc-meaning').textContent = p.meaning;
-  document.getElementById('fc-example').textContent = '"' + p.example + '"';
-  document.getElementById('fc-counter').textContent = `${i + 1} / ${phrases.length}`;
-}
-function nextCard() { cardIndex = (cardIndex + 1) % phrases.length; showCard(cardIndex); }
-function prevCard() { cardIndex = (cardIndex - 1 + phrases.length) % phrases.length; showCard(cardIndex); }
+// ── Vocab ──
+async function addVocab(){
+  const input=document.getElementById('vocab-word-input');
+  const word=input.value.trim(); if(!word)return;
+  const ak=getAK(); if(!ak){openSettings();return;}
 
-// ── TTS engine toggle ──
-function onEngineChange() {
-  const engine = document.getElementById('tts-engine-select').value;
-  document.getElementById('openai-voice-row').classList.toggle('hidden', engine !== 'openai');
-  document.getElementById('browser-voice-row').classList.toggle('hidden', engine !== 'browser');
+  const btn=document.getElementById('vocab-add-btn');
+  btn.disabled=true; btn.textContent='調べ中...';
+  document.getElementById('vocab-error').classList.add('hidden');
+
+  const prompt=`You are an English vocabulary tutor for a Japanese medical researcher.
+Look up the following English word/phrase and provide a JSON object (no markdown, no backticks):
+{"word":"${word}","meaning":"日本語で：意味と医学・学術での使い方を2〜3文で説明","example":"A natural English example sentence using this word in an academic or medical context"}`;
+
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':ak,
+        'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-haiku-4-5',max_tokens:400,messages:[{role:'user',content:prompt}]})
+    });
+    const apiData=await res.json();
+    if(apiData.type==='error')throw new Error(apiData.error?.message);
+    const raw=(apiData.content||[]).map(b=>b.text||'').join('').trim();
+    const match=raw.match(/\{[\s\S]*\}/);
+    if(!match)throw new Error('解析に失敗しました');
+    const entry={...JSON.parse(match[0]),addedAt:new Date().toISOString()};
+
+    // 重複チェック
+    if(vocabList.find(v=>v.word.toLowerCase()===entry.word.toLowerCase())){
+      throw new Error('すでに登録されています');
+    }
+    vocabList.push(entry);
+
+    // Gistに保存
+    const data=await gistLoad()||{};
+    data.vocabulary=vocabList;
+    await gistSave(data);
+
+    input.value='';
+    renderVocabList();
+    showVocabCard(vocabList.length-1);
+  }catch(e){
+    const el=document.getElementById('vocab-error');
+    el.textContent=`エラー：${e.message}`; el.classList.remove('hidden');
+  }
+  btn.disabled=false; btn.textContent='追加';
 }
+
+function renderVocabList(){
+  const total=vocabList.length;
+  document.getElementById('vocab-total').textContent=`${total} words`;
+  const listEl=document.getElementById('vocab-list');
+  listEl.innerHTML='';
+  if(!total){
+    document.getElementById('vocab-empty').classList.remove('hidden');
+    document.getElementById('vocab-fc-area').classList.add('hidden');
+    return;
+  }
+  document.getElementById('vocab-empty').classList.add('hidden');
+  document.getElementById('vocab-fc-area').classList.remove('hidden');
+
+  [...vocabList].reverse().forEach((v,ri)=>{
+    const i=vocabList.length-1-ri;
+    const d=document.createElement('div'); d.className='vocab-item';
+    d.innerHTML=`<div style="flex:1;">
+      <div class="vocab-word">${v.word}</div>
+      <div class="vocab-meaning">${v.meaning}</div>
+      <div class="vocab-example">"${v.example}"</div>
+    </div>
+    <button class="btn btn-danger-sm" onclick="deleteVocab(${i})">削除</button>`;
+    listEl.appendChild(d);
+  });
+}
+
+async function deleteVocab(i){
+  vocabList.splice(i,1);
+  const data=await gistLoad()||{};
+  data.vocabulary=vocabList;
+  await gistSave(data);
+  renderVocabList();
+  if(vocabList.length){
+    vocabIndex=Math.min(vocabIndex,vocabList.length-1);
+    showVocabCard(vocabIndex);
+  }
+}
+
+function switchVocabTab(name,btn){
+  document.querySelectorAll('#page-vocab .tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('vocab-flashcard-view').classList.toggle('hidden',name!=='flashcard');
+  document.getElementById('vocab-list-view').classList.toggle('hidden',name!=='list');
+}
+
+function flipVocabCard(){vocabFlipped=!vocabFlipped;document.getElementById('vocab-flashcard').classList.toggle('flipped',vocabFlipped);}
+function showVocabCard(i){
+  if(!vocabList.length)return;
+  vocabFlipped=false; document.getElementById('vocab-flashcard').classList.remove('flipped');
+  const v=vocabList[i];
+  document.getElementById('vfc-word').textContent=v.word;
+  document.getElementById('vfc-meaning').textContent=v.meaning;
+  document.getElementById('vfc-example').textContent='"'+v.example+'"';
+  document.getElementById('vfc-counter').textContent=`${i+1} / ${vocabList.length}`;
+}
+function nextVocabCard(){vocabIndex=(vocabIndex+1)%vocabList.length;showVocabCard(vocabIndex);}
+function prevVocabCard(){vocabIndex=(vocabIndex-1+vocabList.length)%vocabList.length;showVocabCard(vocabIndex);}
 
 // ── TTS ──
-let currentAudio = null;
-
-function voiceScore(v) {
-  const n = v.name.toLowerCase();
-  if (n.includes('enhanced') && v.lang.startsWith('en')) return 90;
-  if (n.includes('samantha')) return 80;
-  if (n.includes('google') && v.lang === 'en-US') return 70;
-  if (n.includes('google') && v.lang.startsWith('en')) return 65;
-  if (v.lang === 'en-US') return 40;
-  if (v.lang.startsWith('en')) return 30;
+function onEngineChange(){
+  const e=document.getElementById('tts-engine-select').value;
+  document.getElementById('openai-voice-row').classList.toggle('hidden',e!=='openai');
+  document.getElementById('browser-voice-row').classList.toggle('hidden',e!=='browser');
+}
+function toggleRepeat(){
+  isRepeat=!isRepeat;
+  document.getElementById('repeat-btn').classList.toggle('active',isRepeat);
+}
+function voiceScore(v){
+  const n=v.name.toLowerCase();
+  if(n.includes('enhanced')&&v.lang.startsWith('en'))return 90;
+  if(n.includes('samantha'))return 80;
+  if(n.includes('google')&&v.lang==='en-US')return 70;
+  if(n.includes('google')&&v.lang.startsWith('en'))return 65;
+  if(v.lang==='en-US')return 40;
+  if(v.lang.startsWith('en'))return 30;
   return 0;
 }
-function populateVoices() {
-  const voices = speechSynthesis.getVoices().filter(v => v.lang.startsWith('en'));
-  if (!voices.length) return;
-  voices.sort((a, b) => voiceScore(b) - voiceScore(a));
-  availableVoices = voices;
-  const sel = document.getElementById('voice-select');
-  sel.innerHTML = '';
-  voices.forEach((v, i) => {
-    const opt = document.createElement('option');
-    opt.value = i;
-    let label = v.name;
-    if (v.name.toLowerCase().includes('enhanced')) label += ' ★';
-    else if (v.name.toLowerCase().includes('google')) label += ' ◆';
-    opt.textContent = `${label} (${v.lang})`;
+function populateVoices(){
+  const voices=speechSynthesis.getVoices().filter(v=>v.lang.startsWith('en'));
+  if(!voices.length)return;
+  voices.sort((a,b)=>voiceScore(b)-voiceScore(a));
+  availableVoices=voices;
+  const sel=document.getElementById('voice-select');
+  sel.innerHTML='';
+  voices.forEach((v,i)=>{
+    const opt=document.createElement('option'); opt.value=i;
+    let label=v.name;
+    if(v.name.toLowerCase().includes('enhanced'))label+=' ★';
+    else if(v.name.toLowerCase().includes('google'))label+=' ◆';
+    opt.textContent=`${label} (${v.lang})`;
     sel.appendChild(opt);
   });
-  selectedVoice = voices[0];
-  updateQualityTag(voices[0]);
+  selectedVoice=voices[0];
+  const tag=document.getElementById('voice-quality-tag');
+  const n=voices[0].name.toLowerCase();
+  if(n.includes('enhanced')){tag.textContent='高品質';tag.classList.remove('hidden');}
+  else if(n.includes('google')){tag.textContent='Google';tag.classList.remove('hidden');}
 }
-function onVoiceChange() {
-  selectedVoice = availableVoices[parseInt(document.getElementById('voice-select').value)];
-  updateQualityTag(selectedVoice);
+function onVoiceChange(){
+  selectedVoice=availableVoices[parseInt(document.getElementById('voice-select').value)];
 }
-function updateQualityTag(v) {
-  const tag = document.getElementById('voice-quality-tag');
-  const n = v.name.toLowerCase();
-  if (n.includes('enhanced')) { tag.textContent = '高品質'; tag.classList.remove('hidden'); }
-  else if (n.includes('google')) { tag.textContent = 'Google'; tag.classList.remove('hidden'); }
-  else tag.classList.add('hidden');
-}
-if (speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = populateVoices;
-setTimeout(populateVoices, 200);
+if(speechSynthesis.onvoiceschanged!==undefined)speechSynthesis.onvoiceschanged=populateVoices;
+setTimeout(populateVoices,200);
 
-async function toggleTTS() {
-  // 再生中なら停止
-  if (isSpeaking) {
-    if (currentAudio) { currentAudio.pause(); currentAudio = null; }
-    speechSynthesis.cancel();
-    stopProgress();
-    return;
+async function toggleTTS(){
+  if(isSpeaking){
+    if(currentAudio){currentAudio.pause();currentAudio=null;}
+    speechSynthesis.cancel(); stopProgress(); return;
   }
+  const el=document.getElementById('script-display');
+  const text=el.innerText||el.textContent; if(!text)return;
+  const engine=document.getElementById('tts-engine-select').value;
+  const speed=parseFloat(document.getElementById('speed-select').value);
+  lastPlayText=text; lastPlaySpeed=speed;
+  if(engine==='openai'){const ok=getOK();if(!ok){openSettings();return;}await playOpenAITTS(text,ok,speed);}
+  else{playBrowserTTS(text,speed);}
+}
 
-  const el = document.getElementById('script-display');
-  const text = el.innerText || el.textContent;
-  if (!text) return;
+// Audio cache
+function getAudioCacheKey(text,voice,speed){
+  const hash=btoa(encodeURIComponent(text.slice(0,80)+voice+speed)).replace(/[^a-zA-Z0-9]/g,'').slice(0,40);
+  return`pt_audio_${hash}`;
+}
+function saveAudioCache(key,base64){
+  try{localStorage.setItem(key,base64);localStorage.setItem(key+'_ts',Date.now().toString());}
+  catch(e){clearOldAudioCache();try{localStorage.setItem(key,base64);}catch(e2){}}
+}
+function loadAudioCache(key){return localStorage.getItem(key);}
+function clearOldAudioCache(){
+  const keys=Object.keys(localStorage).filter(k=>k.startsWith('pt_audio_')&&!k.endsWith('_ts'));
+  keys.sort((a,b)=>parseInt(localStorage.getItem(a+'_ts')||'0')-parseInt(localStorage.getItem(b+'_ts')||'0'));
+  keys.slice(0,Math.ceil(keys.length/2)).forEach(k=>{localStorage.removeItem(k);localStorage.removeItem(k+'_ts');});
+}
 
-  const engine = document.getElementById('tts-engine-select').value;
-  const speed = parseFloat(document.getElementById('speed-select').value);
-
-  // 繰り返し用に保存
-  lastPlayText = text;
-  lastPlaySpeed = speed;
-
-  if (engine === 'openai') {
-    const ok = getOpenAIKey();
-    if (!ok) { openSettings(); return; }
-    await playOpenAITTS(text, ok, speed);
-  } else {
-    playBrowserTTS(text, speed);
+async function playOpenAITTS(text,apiKey,speed){
+  const voice=document.getElementById('openai-voice-select').value;
+  const cacheKey=getAudioCacheKey(text,voice,speed);
+  const cached=loadAudioCache(cacheKey);
+  isSpeaking=true;
+  if(cached){
+    document.getElementById('play-icon').textContent='⏸';
+    document.getElementById('play-label').textContent='Pause';
+    await playBase64Audio(cached); return;
   }
-}
-
-// ── Audio cache (localStorage) ──
-function getAudioCacheKey(text, voice, speed) {
-  // スクリプト・声・速度の組み合わせでキャッシュキーを生成
-  const hash = btoa(encodeURIComponent(text.slice(0, 80) + voice + speed)).replace(/[^a-zA-Z0-9]/g, '').slice(0, 40);
-  return `pt_audio_${hash}`;
-}
-
-function saveAudioCache(key, base64) {
-  try {
-    localStorage.setItem(key, base64);
-    localStorage.setItem(key + '_ts', Date.now().toString());
-  } catch(e) {
-    // localStorageが満杯の場合は古いキャッシュを削除
-    clearOldAudioCache();
-    try { localStorage.setItem(key, base64); } catch(e2) { /* 諦める */ }
-  }
-}
-
-function loadAudioCache(key) {
-  return localStorage.getItem(key);
-}
-
-function clearOldAudioCache() {
-  const keys = Object.keys(localStorage).filter(k => k.startsWith('pt_audio_') && !k.endsWith('_ts'));
-  // タイムスタンプが古い順に削除
-  keys.sort((a, b) => {
-    const ta = parseInt(localStorage.getItem(a + '_ts') || '0');
-    const tb = parseInt(localStorage.getItem(b + '_ts') || '0');
-    return ta - tb;
-  });
-  keys.slice(0, Math.ceil(keys.length / 2)).forEach(k => {
-    localStorage.removeItem(k);
-    localStorage.removeItem(k + '_ts');
-  });
-}
-
-async function playOpenAITTS(text, apiKey, speed) {
-  const voice = document.getElementById('openai-voice-select').value;
-  const cacheKey = getAudioCacheKey(text, voice, speed);
-  const cached = loadAudioCache(cacheKey);
-
-  isSpeaking = true;
-
-  // キャッシュがあれば即座に再生
-  if (cached) {
-    document.getElementById('play-icon').textContent = '⏸';
-    document.getElementById('play-label').textContent = 'Pause';
-    await playBase64Audio(cached);
-    return;
-  }
-
-  // キャッシュなし → APIで生成
-  document.getElementById('play-icon').textContent = '⏳';
-  document.getElementById('play-label').textContent = '生成中...';
-
-  let audioCtx = null;
-  try {
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    await audioCtx.resume();
-  } catch(e) { /* 非対応環境はスキップ */ }
-
-  try {
-    const res = await fetch('https://api.openai.com/v1/audio/speech', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`
-      },
-      body: JSON.stringify({
-        model: 'tts-1-hd',
-        input: text,
-        voice: voice,
-        speed: Math.min(Math.max(speed, 0.25), 4.0)
-      })
+  document.getElementById('play-icon').textContent='⏳';
+  document.getElementById('play-label').textContent='生成中...';
+  let audioCtx=null;
+  try{audioCtx=new(window.AudioContext||window.webkitAudioContext)();await audioCtx.resume();}catch(e){}
+  try{
+    const res=await fetch('https://api.openai.com/v1/audio/speech',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':`Bearer ${apiKey}`},
+      body:JSON.stringify({model:'tts-1-hd',input:text,voice,speed:Math.min(Math.max(speed,0.25),4.0)})
     });
-
-    if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.error?.message || 'OpenAI TTSエラー');
-    }
-
-    const arrayBuffer = await res.arrayBuffer();
-
-    // base64に変換してキャッシュ保存
-    const base64 = arrayBufferToBase64(arrayBuffer);
-    saveAudioCache(cacheKey, base64);
-
-    document.getElementById('play-icon').textContent = '⏸';
-    document.getElementById('play-label').textContent = 'Pause';
-
-    if (audioCtx) {
-      await playWithAudioContext(audioCtx, arrayBuffer);
-    } else {
-      await playBase64Audio(base64);
-    }
-
-  } catch(e) {
-    stopProgress();
-    alert(`音声生成エラー：${e.message}`);
-  }
+    if(!res.ok){const err=await res.json();throw new Error(err.error?.message||'TTS error');}
+    const ab=await res.arrayBuffer();
+    const b64=arrayBufferToBase64(ab); saveAudioCache(cacheKey,b64);
+    document.getElementById('play-icon').textContent='⏸';
+    document.getElementById('play-label').textContent='Pause';
+    if(audioCtx)await playWithAudioContext(audioCtx,ab);
+    else await playBase64Audio(b64);
+  }catch(e){stopProgress();alert(`音声生成エラー：${e.message}`);}
 }
 
-function arrayBufferToBase64(buffer) {
-  let binary = '';
-  const bytes = new Uint8Array(buffer);
-  for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
-  return btoa(binary);
+function arrayBufferToBase64(buffer){
+  let bin=''; const bytes=new Uint8Array(buffer);
+  for(let i=0;i<bytes.byteLength;i++)bin+=String.fromCharCode(bytes[i]);
+  return btoa(bin);
 }
-
-function base64ToArrayBuffer(base64) {
-  const binary = atob(base64);
-  const bytes = new Uint8Array(binary.length);
-  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+function base64ToArrayBuffer(b64){
+  const bin=atob(b64); const bytes=new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);
   return bytes.buffer;
 }
-
-async function playBase64Audio(base64) {
-  try {
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    await audioCtx.resume();
-    const arrayBuffer = base64ToArrayBuffer(base64);
-    await playWithAudioContext(audioCtx, arrayBuffer);
-  } catch(e) {
-    // AudioContextが使えない場合はBlobフォールバック
-    const binary = atob(base64);
-    const bytes = new Uint8Array(binary.length);
-    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-    const blob = new Blob([bytes], { type: 'audio/mpeg' });
-    const url = URL.createObjectURL(blob);
-    currentAudio = new Audio(url);
-    currentAudio.onended = () => { stopProgress(true); URL.revokeObjectURL(url); };
-    currentAudio.onerror = () => stopProgress();
-    currentAudio.onloadedmetadata = () => {
-      const duration = currentAudio.duration;
-      progressInterval = setInterval(() => {
-        if (!currentAudio) return;
-        document.getElementById('progress-bar').style.width =
-          Math.min((currentAudio.currentTime / duration) * 100, 100) + '%';
-      }, 200);
+async function playBase64Audio(b64){
+  try{
+    const ctx=new(window.AudioContext||window.webkitAudioContext)();
+    await ctx.resume(); await playWithAudioContext(ctx,base64ToArrayBuffer(b64));
+  }catch(e){
+    const bin=atob(b64); const bytes=new Uint8Array(bin.length);
+    for(let i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);
+    const url=URL.createObjectURL(new Blob([bytes],{type:'audio/mpeg'}));
+    currentAudio=new Audio(url);
+    currentAudio.onended=()=>{stopProgress(true);URL.revokeObjectURL(url);};
+    currentAudio.onerror=()=>stopProgress();
+    currentAudio.onloadedmetadata=()=>{
+      const dur=currentAudio.duration;
+      progressInterval=setInterval(()=>{
+        if(!currentAudio)return;
+        document.getElementById('progress-bar').style.width=Math.min((currentAudio.currentTime/dur)*100,100)+'%';
+      },200);
     };
     await currentAudio.play();
   }
 }
-
-async function playWithAudioContext(audioCtx, arrayBuffer) {
-  const decoded = await audioCtx.decodeAudioData(arrayBuffer);
-  const source = audioCtx.createBufferSource();
-  source.buffer = decoded;
-  source.connect(audioCtx.destination);
-
-  const duration = decoded.duration;
-  const startTime = audioCtx.currentTime;
-
-  progressInterval = setInterval(() => {
-    const elapsed = audioCtx.currentTime - startTime;
-    const pct = Math.min((elapsed / duration) * 100, 100);
-    document.getElementById('progress-bar').style.width = pct + '%';
-    if (elapsed >= duration) stopProgress(true);
-  }, 200);
-
-  currentAudio = { pause: () => { try { source.stop(); audioCtx.close(); } catch(e){} } };
-  source.onended = () => stopProgress(true);
-  source.start(0);
+async function playWithAudioContext(ctx,ab){
+  const decoded=await ctx.decodeAudioData(ab);
+  const src=ctx.createBufferSource(); src.buffer=decoded; src.connect(ctx.destination);
+  const dur=decoded.duration, t0=ctx.currentTime;
+  progressInterval=setInterval(()=>{
+    const el=ctx.currentTime-t0;
+    document.getElementById('progress-bar').style.width=Math.min((el/dur)*100,100)+'%';
+    if(el>=dur)stopProgress(true);
+  },200);
+  currentAudio={pause:()=>{try{src.stop();ctx.close();}catch(e){}}};
+  src.onended=()=>stopProgress(true); src.start(0);
 }
-
-function playBrowserTTS(text, speed) {
-  utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = 'en-US';
-  utterance.rate = speed;
-  if (selectedVoice) utterance.voice = selectedVoice;
-  const totalChars = text.length;
-  utterance.onstart = () => {
-    isSpeaking = true;
-    document.getElementById('play-icon').textContent = '⏸';
-    document.getElementById('play-label').textContent = 'Pause';
-    let prog = 0;
-    progressInterval = setInterval(() => {
-      prog = Math.min(prog + totalChars / (speed * 120), totalChars);
-      document.getElementById('progress-bar').style.width = Math.round((prog / totalChars) * 100) + '%';
-    }, 500);
+function playBrowserTTS(text,speed){
+  utterance=new SpeechSynthesisUtterance(text);
+  utterance.lang='en-US'; utterance.rate=speed;
+  if(selectedVoice)utterance.voice=selectedVoice;
+  const tc=text.length;
+  utterance.onstart=()=>{
+    isSpeaking=true;
+    document.getElementById('play-icon').textContent='⏸';
+    document.getElementById('play-label').textContent='Pause';
+    let prog=0;
+    progressInterval=setInterval(()=>{
+      prog=Math.min(prog+tc/(speed*120),tc);
+      document.getElementById('progress-bar').style.width=Math.round((prog/tc)*100)+'%';
+    },500);
   };
-  utterance.onend = utterance.onerror = () => stopProgress(true);
+  utterance.onend=utterance.onerror=()=>stopProgress(true);
   speechSynthesis.speak(utterance);
 }
-
-function stopProgress(fromEnded = false) {
-  isSpeaking = false; clearInterval(progressInterval);
-  document.getElementById('play-icon').textContent = '▶';
-  document.getElementById('play-label').textContent = 'Play';
-  document.getElementById('progress-bar').style.width = '0%';
-
-  // 繰り返し再生
-  if (fromEnded && isRepeat) {
-    setTimeout(() => {
-      const engine = document.getElementById('tts-engine-select').value;
-      if (engine === 'openai') {
-        const ok = getOpenAIKey();
-        if (ok && lastPlayText) playOpenAITTS(lastPlayText, ok, lastPlaySpeed);
-      } else {
-        if (lastPlayText) playBrowserTTS(lastPlayText, lastPlaySpeed);
-      }
-    }, 800);
+function stopProgress(fromEnded=false){
+  isSpeaking=false; clearInterval(progressInterval);
+  document.getElementById('play-icon').textContent='▶';
+  document.getElementById('play-label').textContent='Play';
+  document.getElementById('progress-bar').style.width='0%';
+  if(fromEnded&&isRepeat){
+    setTimeout(()=>{
+      const e=document.getElementById('tts-engine-select').value;
+      if(e==='openai'){const ok=getOK();if(ok&&lastPlayText)playOpenAITTS(lastPlayText,ok,lastPlaySpeed);}
+      else if(lastPlayText)playBrowserTTS(lastPlayText,lastPlaySpeed);
+    },800);
   }
 }
 
