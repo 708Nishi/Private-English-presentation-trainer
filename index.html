@@ -290,7 +290,7 @@
 <div class="header">
   <div class="week-badge">📅 <span id="week-label"></span></div>
   <h1>Weekly Presentation Trainer</h1>
-  <p>スクリプト · リスニング · フレーズ · 単語帳 <span style="font-size:11px;color:var(--text-3);margin-left:6px;">v1.6.1</span></p>
+  <p>スクリプト · リスニング · フレーズ · 単語帳 <span style="font-size:11px;color:var(--text-3);margin-left:6px;">v1.6.2</span></p>
 </div>
 
 <!-- Settings bar -->
@@ -737,15 +737,16 @@ For each word, return a JSON array. No markdown, no backticks. Return ONLY the J
 Rules:
 - Content words (nouns, main verbs, adjectives, adverbs): type="content"
 - Function words (articles, prepositions, conjunctions, auxiliary verbs, pronouns, determiners): type="function"
-- Punctuation marks: type="punct"
+- Punctuation marks (period, comma, etc.): type="punct"
 - For content words, indicate the stressed syllable index (0-based) in "stress" field, and syllables as array in "syllables" field
   Example: "research" → syllables:["re","search"], stress:1
   Example: "chronic" → syllables:["chron","ic"], stress:0
   Example: "contribute" → syllables:["con","trib","ute"], stress:1
 - For function words and punct, syllables:[], stress:-1
+- IMPORTANT: The "word" field must be a plain string. Never include quotes or special JSON characters in the word field. For punctuation, use: period, comma, exclamation, question, semicolon, colon etc. as the word value.
 
 Return format:
-[{"word":"the","syllables":[],"stress":-1,"type":"function"},{"word":"research","syllables":["re","search"],"stress":1,"type":"content"}]
+[{"word":"the","syllables":[],"stress":-1,"type":"function"},{"word":"research","syllables":["re","search"],"stress":1,"type":"content"},{"word":"period","syllables":[],"stress":-1,"type":"punct"}]
 
 Script:
 """
@@ -786,16 +787,27 @@ ${script}
     }
 
     // HTMLに変換（JS側でHTMLを組み立て）
+    const punctMap = {
+      'period':'.','comma':',','exclamation':'!','question':'?',
+      'semicolon':';','colon':':','hyphen':'-','dash':'—',
+      'ellipsis':'...','apostrophe':"'"
+    };
     let html = '';
     words.forEach(w => {
-      if (w.type === 'punct') {
-        html += `<span>${w.word}</span>`;
-        // センテンス末尾の句読点の後に改行を挿入
-        if (/^[.!?]$/.test(w.word)) {
+      let wordText = String(w.word || '');
+      // 句読点の英語名を記号に変換
+      if (w.type === 'punct' && punctMap[wordText.toLowerCase()]) {
+        wordText = punctMap[wordText.toLowerCase()];
+      }
+      wordText = wordText.replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+      if (w.type === 'punct' || /^[.,!?;:'"()\-–—…]+$/.test(wordText)) {
+        html += `<span>${wordText}</span>`;
+        if (/^[.!?]$/.test(wordText)) {
           html += '<br><br>';
         }
       } else if (w.type === 'function') {
-        html += `<span class="w-function">${w.word}</span> `;
+        html += `<span class="w-function">${wordText}</span> `;
       } else {
         // 音節を組み立て、主音節にunderlineを付与
         let display;
@@ -806,7 +818,7 @@ ${script}
               : syl
           ).join('·');
         } else {
-          display = w.word;
+          display = wordText;
         }
         html += `<span class="w-content">${display}</span> `;
       }
