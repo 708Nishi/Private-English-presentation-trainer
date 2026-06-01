@@ -290,7 +290,7 @@
 <div class="header">
   <div class="week-badge">📅 <span id="week-label"></span></div>
   <h1>Weekly Presentation Trainer</h1>
-  <p>スクリプト · リスニング · フレーズ · 単語帳 <span style="font-size:11px;color:var(--text-3);margin-left:6px;">v1.6.5</span></p>
+  <p>スクリプト · リスニング · フレーズ · 単語帳 <span style="font-size:11px;color:var(--text-3);margin-left:6px;">v1.7.0</span></p>
 </div>
 
 <!-- Settings bar -->
@@ -737,27 +737,29 @@ async function generatePronGuide(script) {
   const prompt = `You are an English pronunciation coach. Analyze the following script and return pronunciation markup.
 
 For each token (word or punctuation), output one line in this exact pipe-separated format:
-TOKEN|TYPE|SYLLABLES|STRESS
+TOKEN|TYPE|SYLLABLES|STRESSED_SYLLABLE
 
 Rules:
 - TYPE must be exactly one of: content, function, punct
 - content = nouns, main verbs, adjectives, adverbs
 - function = articles, prepositions, conjunctions, auxiliary verbs, pronouns, determiners
 - punct = any punctuation mark (use the actual symbol as TOKEN)
-- SYLLABLES: hyphen-separated syllables for content words only (e.g. re-search, chron-ic, com-mit-ted). Leave empty for function/punct.
-- STRESS: 0-based index of the stressed syllable for content words (e.g. 1 for re-SEARCH). Use -1 for function/punct.
+- SYLLABLES: hyphen-separated syllables for content words only. Leave empty for function/punct.
+- STRESSED_SYLLABLE: the exact syllable string that carries primary stress for content words. Leave empty for function/punct.
 - Output ONLY the pipe-separated lines. No explanation, no blank lines, no markdown.
 
 Example:
-As|function||-1
-we|function||-1
-move|content|move|0
-forward|content|for-ward|0
-,|punct||-1
-we|function||-1
-are|function||-1
-committed|content|com-mit-ted|1
-.|punct||-1
+the|function||-
+research|content|re-search|search
+chronic|content|chron-ic|chron
+contribute|content|con-trib-ute|trib
+communication|content|com-mu-ni-ca-tion|ca
+effectively|content|ef-fec-tive-ly|fec
+,|punct||-
+we|function||-
+are|function||-
+committed|content|com-mit-ted|mit
+.|punct||-
 
 Script:
 """
@@ -794,8 +796,7 @@ ${script}
       const word = parts[0].trim();
       const type = parts[1].trim();
       const syllablesStr = parts[2].trim();
-      const stressNum = parseInt(parts[3].trim());
-      const stress = Number.isFinite(stressNum) ? stressNum : -1;
+      const stressedSyl = parts[3].trim().toLowerCase();
       const wordSafe = word.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 
       if (type === 'punct') {
@@ -806,9 +807,11 @@ ${script}
       } else {
         const syllables = syllablesStr ? syllablesStr.split('-') : [];
         let display;
-        if (syllables.length > 1 && stress >= 0 && stress < syllables.length) {
-          display = syllables.map((syl, i) =>
-            i === stress ? `<span class="stressed">${syl}</span>` : syl
+        if (syllables.length > 1 && stressedSyl && stressedSyl !== '-') {
+          display = syllables.map(syl =>
+            syl.toLowerCase() === stressedSyl
+              ? `<span class="stressed">${syl}</span>`
+              : syl
           ).join('\u00B7');
         } else {
           display = wordSafe;
