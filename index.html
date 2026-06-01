@@ -290,7 +290,7 @@
 <div class="header">
   <div class="week-badge">📅 <span id="week-label"></span></div>
   <h1>Weekly Presentation Trainer</h1>
-  <p>スクリプト · リスニング · フレーズ · 単語帳 <span style="font-size:11px;color:var(--text-3);margin-left:6px;">v1.7.2</span></p>
+  <p>スクリプト · リスニング · フレーズ · 単語帳 <span style="font-size:11px;color:var(--text-3);margin-left:6px;">v1.7.3</span></p>
 </div>
 
 <!-- Settings bar -->
@@ -874,6 +874,8 @@ function highlightScript(script,extractedPhrases){
     const esc=p.phrase.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
     escaped=escaped.replace(new RegExp(`(${esc})`,'gi'),`<mark data-idx="${idx}" onclick="jumpToCard(${idx})" title="${p.phrase}">$1</mark>`);
   });
+  // 段落間の空行を<br><br>に、単純な改行を<br>に変換
+  escaped=escaped.replace(/\n\n+/g,'<br><br>').replace(/\n/g,'<br>');
   return escaped;
 }
 
