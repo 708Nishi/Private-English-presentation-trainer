@@ -116,6 +116,27 @@
     padding:10px 14px;margin-bottom:12px;font-size:13px;color:var(--success);
     display:flex;align-items:center;justify-content:space-between;gap:8px;}
 
+  /* ── Script mode toggle ── */
+  .script-mode-toggle{display:flex;gap:4px;background:var(--bg);border:1.5px solid var(--border-light);
+    border-radius:10px;padding:4px;margin-bottom:1rem;}
+  .mode-btn{flex:1;font-size:13px;font-weight:500;padding:6px;border:none;border-radius:7px;
+    background:transparent;color:var(--text-3);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s;}
+  .mode-btn.active{background:var(--card);color:var(--text);border:1.5px solid var(--border);}
+
+  /* ── Pronunciation legend ── */
+  .pron-legend{display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+    font-size:11px;margin-bottom:10px;padding:6px 10px;
+    background:var(--bg);border-radius:8px;border:1px solid var(--border-light);}
+  .legend-content{color:var(--text);font-weight:600;}
+  .legend-function{color:var(--text-3);}
+  .legend-stress{color:var(--purple-dark);text-decoration:underline;text-underline-offset:3px;}
+
+  /* ── Pronunciation text ── */
+  .pron-text{line-height:2.1;}
+  .w-content{font-weight:700;font-size:1.05em;color:var(--text);}
+  .w-content .stressed{text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--purple);text-decoration-thickness:2px;}
+  .w-function{color:var(--text-3);font-size:0.88em;font-weight:400;}
+
   /* ── Script display ── */
   .script-text{font-size:14px;line-height:1.9;color:var(--text);}
   .script-text mark{background:var(--purple-light);color:var(--purple-deeper);
@@ -324,13 +345,34 @@
     <div class="card">
       <div class="card-head">
         <div class="card-title">📄 Script</div>
-        <div style="display:flex;align-items:center;gap:6px;">
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
           <span class="tag" id="word-count"></span>
           <button class="btn btn-sm" onclick="openArchiveModal()">📦 アーカイブ</button>
           <button class="btn btn-sm" onclick="showInputView()">✏️ 更新</button>
         </div>
       </div>
-      <div class="script-text" id="script-display"></div>
+
+      <!-- Script mode toggle -->
+      <div class="script-mode-toggle">
+        <button class="mode-btn active" id="mode-btn-normal" onclick="switchScriptMode('normal')">📖 通常</button>
+        <button class="mode-btn" id="mode-btn-pron" onclick="switchScriptMode('pron')">🗣 発音ガイド</button>
+      </div>
+
+      <!-- Normal view -->
+      <div id="script-normal">
+        <div class="script-text" id="script-display"></div>
+      </div>
+
+      <!-- Pronunciation view -->
+      <div id="script-pron" class="hidden">
+        <div class="pron-legend">
+          <span class="legend-content">■ 内容語（強く）</span>
+          <span class="legend-function">■ 機能語（弱く）</span>
+          <span class="legend-stress">下線 = 主音節</span>
+        </div>
+        <div id="pron-loading" class="hidden" style="text-align:center;padding:1.5rem;font-size:13px;color:var(--text-3);">🗣 発音ガイドを生成中...</div>
+        <div class="script-text pron-text" id="pron-display"></div>
+      </div>
       <div class="tts-section">
         <div class="tts-row">
           <button class="btn btn-play" id="play-btn" onclick="toggleTTS()">
@@ -478,6 +520,7 @@ let utterance=null, isSpeaking=false, progressInterval=null;
 let availableVoices=[], selectedVoice=null;
 let isRepeat=false, lastPlayText='', lastPlaySpeed=1.0;
 let currentAudio=null;
+let currentScript='', pronCacheHtml='';
 
 // ── Week label ──
 const now=new Date(), yr=now.getFullYear();
@@ -666,9 +709,109 @@ function showExtractError(msg){
   el.textContent=msg; el.classList.remove('hidden');
 }
 
-// ── Render script result ──
+// ── Script mode toggle ──
+let pronCacheHtml = '';
+let currentScript = '';
+
+function switchScriptMode(mode) {
+  document.getElementById('mode-btn-normal').classList.toggle('active', mode === 'normal');
+  document.getElementById('mode-btn-pron').classList.toggle('active', mode === 'pron');
+  document.getElementById('script-normal').classList.toggle('hidden', mode !== 'normal');
+  document.getElementById('script-pron').classList.toggle('hidden', mode !== 'pron');
+
+  if (mode === 'pron') {
+    if (pronCacheHtml) {
+      document.getElementById('pron-display').innerHTML = pronCacheHtml;
+    } else {
+      generatePronGuide(currentScript);
+    }
+  }
+}
+
+async function generatePronGuide(script) {
+  const ak = getAK(); if (!ak) { openSettings(); return; }
+  document.getElementById('pron-loading').classList.remove('hidden');
+  document.getElementById('pron-display').innerHTML = '';
+
+  const prompt = `You are an English pronunciation coach. Analyze the following script and mark each word for pronunciation practice.
+
+For EACH word, classify it and return a JSON array of word objects. No markdown, no backticks. Return only the JSON array.
+
+Rules:
+- Content words (nouns, main verbs, adjectives, adverbs): type="content"
+- Function words (articles, prepositions, conjunctions, auxiliary verbs, pronouns, determiners): type="function"
+- For content words, mark the stressed syllable by wrapping it in <s> tags within the "display" field
+  Example: "contribute" → display: "con·tri·<s>bute</s>"
+  Example: "research" → display: "re·<s>search</s>"
+  Example: "chronic" → display: "<s>chron</s>·ic"
+- For function words, just use the plain word in "display"
+- Preserve punctuation as separate entries with type="punct"
+
+Return format (array of objects):
+[{"word":"the","display":"the","type":"function"},{"word":"research","display":"re·<s>search</s>","type":"content"},{"word":"focuses","display":"<s>fo</s>·cus·es","type":"content"},{"word":"on","display":"on","type":"function"}]
+
+Script to analyze:
+"""
+${script}
+"""`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': ak,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5',
+        max_tokens: 4000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    const apiData = await res.json();
+    if (apiData.type === 'error') throw new Error(apiData.error?.message);
+    const raw = (apiData.content || []).map(b => b.text || '').join('').trim();
+    const match = raw.match(/\[[\s\S]*\]/);
+    if (!match) throw new Error('解析失敗');
+    const words = JSON.parse(match[0]);
+
+    // HTMLに変換
+    let html = '';
+    words.forEach(w => {
+      if (w.type === 'punct') {
+        html += `<span>${w.display}</span>`;
+      } else if (w.type === 'function') {
+        html += `<span class="w-function">${w.display}</span> `;
+      } else {
+        // contentWordの<s>タグをspanに変換
+        const disp = w.display.replace(/<s>(.*?)<\/s>/g, '<span class="stressed">$1</span>');
+        html += `<span class="w-content">${disp}</span> `;
+      }
+    });
+
+    pronCacheHtml = html;
+    document.getElementById('pron-display').innerHTML = html;
+
+  } catch(e) {
+    document.getElementById('pron-display').textContent = `エラー：${e.message}`;
+  }
+  document.getElementById('pron-loading').classList.add('hidden');
+}
 function renderResult(script,extractedPhrases){
   phrases=extractedPhrases;
+  currentScript=script;
+  pronCacheHtml=''; // 新スクリプトのたびにリセット
+
+  // モードを通常に戻す
+  document.getElementById('mode-btn-normal').classList.add('active');
+  document.getElementById('mode-btn-pron').classList.remove('active');
+  document.getElementById('script-normal').classList.remove('hidden');
+  document.getElementById('script-pron').classList.add('hidden');
+  document.getElementById('pron-display').innerHTML='';
+
   document.getElementById('view-input').classList.add('hidden');
   document.getElementById('view-result').classList.remove('hidden');
   document.getElementById('script-display').innerHTML=highlightScript(script,extractedPhrases);
