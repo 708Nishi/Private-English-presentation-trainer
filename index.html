@@ -710,9 +710,6 @@ function showExtractError(msg){
 }
 
 // ── Script mode toggle ──
-let pronCacheHtml = '';
-let currentScript = '';
-
 function switchScriptMode(mode) {
   document.getElementById('mode-btn-normal').classList.toggle('active', mode === 'normal');
   document.getElementById('mode-btn-pron').classList.toggle('active', mode === 'pron');
