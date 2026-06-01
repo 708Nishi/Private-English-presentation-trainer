@@ -290,7 +290,7 @@
 <div class="header">
   <div class="week-badge">📅 <span id="week-label"></span></div>
   <h1>Weekly Presentation Trainer</h1>
-  <p>スクリプト · リスニング · フレーズ · 単語帳 <span style="font-size:11px;color:var(--text-3);margin-left:6px;">v1.6.2</span></p>
+  <p>スクリプト · リスニング · フレーズ · 単語帳 <span style="font-size:11px;color:var(--text-3);margin-left:6px;">v1.6.3</span></p>
 </div>
 
 <!-- Settings bar -->
@@ -775,14 +775,23 @@ ${script}
     const match = raw.match(/\[[\s\S]*\]/);
     if (!match) throw new Error(`JSON配列が見つかりません：${raw.slice(0, 200)}`);
 
-    // パース前に問題箇所を特定
+    // APIがカンマや句読点をwordフィールドにそのまま入れてJSONを壊すケースを修正
+    // "word":"," → "word":"COMMA" のように一時置換してからパース
+    let jsonStr = match[0];
+    // wordフィールドの値が句読点1文字の場合を正規表現で安全な文字列に置換
+    jsonStr = jsonStr.replace(/"word"\s*:\s*","/g, '"word":"COMMA"');
+    jsonStr = jsonStr.replace(/"word"\s*:\s*"\."/g, '"word":"PERIOD"');
+    jsonStr = jsonStr.replace(/"word"\s*:\s*"!"/g, '"word":"EXCLAIM"');
+    jsonStr = jsonStr.replace(/"word"\s*:\s*"\?"/g, '"word":"QUESTION"');
+    jsonStr = jsonStr.replace(/"word"\s*:\s*";"/g, '"word":"SEMICOLON"');
+    jsonStr = jsonStr.replace(/"word"\s*:\s*":"/g, '"word":"COLON"');
+
     let words;
     try {
-      words = JSON.parse(match[0]);
+      words = JSON.parse(jsonStr);
     } catch(parseErr) {
-      // 問題箇所周辺を表示
       const pos = parseInt(parseErr.message.match(/position (\d+)/)?.[1] || '0');
-      const snippet = match[0].slice(Math.max(0, pos-30), pos+30);
+      const snippet = jsonStr.slice(Math.max(0, pos-40), pos+40);
       throw new Error(`JSON解析エラー at pos ${pos}: ...${snippet}...`);
     }
 
@@ -790,7 +799,10 @@ ${script}
     const punctMap = {
       'period':'.','comma':',','exclamation':'!','question':'?',
       'semicolon':';','colon':':','hyphen':'-','dash':'—',
-      'ellipsis':'...','apostrophe':"'"
+      'ellipsis':'...','apostrophe':"'",
+      // 安全な置換キー
+      'PERIOD':'.','COMMA':',','EXCLAIM':'!','QUESTION':'?',
+      'SEMICOLON':';','COLON':':'
     };
     let html = '';
     words.forEach(w => {
