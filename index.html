@@ -290,7 +290,7 @@
 <div class="header">
   <div class="week-badge">📅 <span id="week-label"></span></div>
   <h1>Weekly Presentation Trainer</h1>
-  <p>スクリプト · リスニング · フレーズ · 単語帳</p>
+  <p>スクリプト · リスニング · フレーズ · 単語帳 <span style="font-size:11px;color:var(--text-3);margin-left:6px;">v1.6.0</span></p>
 </div>
 
 <!-- Settings bar -->
@@ -763,7 +763,7 @@ ${script}
       },
       body: JSON.stringify({
         model: 'claude-haiku-4-5',
-        max_tokens: 4000,
+        max_tokens: 8000,
         messages: [{ role: 'user', content: prompt }]
       })
     });
@@ -772,7 +772,7 @@ ${script}
     if (apiData.type === 'error') throw new Error(apiData.error?.message);
     const raw = (apiData.content || []).map(b => b.text || '').join('').trim();
     const match = raw.match(/\[[\s\S]*\]/);
-    if (!match) throw new Error('解析失敗');
+    if (!match) throw new Error(`解析失敗：${raw.slice(0, 120)}`);
     const words = JSON.parse(match[0]);
 
     // HTMLに変換
