@@ -290,7 +290,7 @@
 <div class="header">
   <div class="week-badge">📅 <span id="week-label"></span></div>
   <h1>Weekly Presentation Trainer</h1>
-  <p>スクリプト · リスニング · フレーズ · 単語帳 <span style="font-size:11px;color:var(--text-3);margin-left:6px;">v1.7.0</span></p>
+  <p>スクリプト · リスニング · フレーズ · 単語帳 <span style="font-size:11px;color:var(--text-3);margin-left:6px;">v1.7.2</span></p>
 </div>
 
 <!-- Settings bar -->
@@ -748,16 +748,19 @@ Rules:
 - STRESSED_SYLLABLE: the exact syllable string that carries primary stress for content words. Leave empty for function/punct.
 - Output ONLY the pipe-separated lines. No explanation, no blank lines, no markdown.
 
-Example:
+Important stress principle:
+Many English words shift stress depending on their part of speech. Always determine the POS from context first, then assign stress accordingly.
+For example: "research" as a noun → RE·search (stress on first syllable), as a verb → re·SEARCH (stress on second syllable).
+Apply this context-sensitive stress assignment to ALL words, not just "research".
+
+Example output:
 the|function||-
-research|content|re-search|search
+research|content|re-search|re
 chronic|content|chron-ic|chron
 contribute|content|con-trib-ute|trib
 communication|content|com-mu-ni-ca-tion|ca
 effectively|content|ef-fec-tive-ly|fec
 ,|punct||-
-we|function||-
-are|function||-
 committed|content|com-mit-ted|mit
 .|punct||-
 
