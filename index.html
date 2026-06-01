@@ -16,7 +16,17 @@
   }
   *{box-sizing:border-box;margin:0;padding:0;}
   body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
-  .page{max-width:680px;margin:0 auto;padding:2rem 1.25rem 5rem;}
+  .page{max-width:960px;margin:0 auto;padding:2rem 1.5rem 5rem;}
+
+  /* PC幅では左右2カラム：スクリプト | フレーズ/設定 */
+  @media(min-width:720px){
+    .layout-cols{display:grid;grid-template-columns:1fr 420px;gap:1.25rem;align-items:start;}
+    .col-script{min-width:0;}
+    .col-side{min-width:0;}
+  }
+  @media(max-width:719px){
+    .layout-cols{display:block;}
+  }
 
   /* ── Nav tabs ── */
   .nav{display:flex;gap:4px;background:var(--card);border:1.5px solid var(--border);
@@ -290,7 +300,7 @@
 <div class="header">
   <div class="week-badge">📅 <span id="week-label"></span></div>
   <h1>Weekly Presentation Trainer</h1>
-  <p>スクリプト · リスニング · フレーズ · 単語帳 <span style="font-size:11px;color:var(--text-3);margin-left:6px;">v1.7.3</span></p>
+  <p>スクリプト · リスニング · フレーズ · 単語帳 <span style="font-size:11px;color:var(--text-3);margin-left:6px;">v1.7.4</span></p>
 </div>
 
 <!-- Settings bar -->
@@ -342,113 +352,122 @@
 
   <!-- Result view -->
   <div id="view-result" class="hidden">
-    <div class="card">
-      <div class="card-head">
-        <div class="card-title">📄 Script</div>
-        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
-          <span class="tag" id="word-count"></span>
-          <button class="btn btn-sm" onclick="openArchiveModal()">📦 アーカイブ</button>
-          <button class="btn btn-sm" onclick="showInputView()">✏️ 更新</button>
-        </div>
-      </div>
-
-      <!-- Script mode toggle -->
-      <div class="script-mode-toggle">
-        <button class="mode-btn active" id="mode-btn-normal" onclick="switchScriptMode('normal')">📖 通常</button>
-        <button class="mode-btn" id="mode-btn-pron" onclick="switchScriptMode('pron')">🗣 発音ガイド</button>
-      </div>
-
-      <!-- Normal view -->
-      <div id="script-normal">
-        <div class="script-text" id="script-display"></div>
-      </div>
-
-      <!-- Pronunciation view -->
-      <div id="script-pron" class="hidden">
-        <div class="pron-legend">
-          <span class="legend-content">■ 内容語（強く）</span>
-          <span class="legend-function">■ 機能語（弱く）</span>
-          <span class="legend-stress">下線 = 主音節</span>
-        </div>
-        <div id="pron-loading" class="hidden" style="text-align:center;padding:1.5rem;font-size:13px;color:var(--text-3);">🗣 発音ガイドを生成中...</div>
-        <div class="script-text pron-text" id="pron-display"></div>
-      </div>
-      <div class="tts-section">
-        <div class="tts-row">
-          <button class="btn btn-play" id="play-btn" onclick="toggleTTS()">
-            <span id="play-icon">▶</span><span id="play-label">Play</span>
-          </button>
-          <div class="prog-wrap"><div class="prog-bar" id="progress-bar"></div></div>
-          <button class="btn btn-repeat" id="repeat-btn" onclick="toggleRepeat()" title="繰り返し再生">🔁</button>
-        </div>
-        <div class="tts-row">
-          <span class="tts-lbl">エンジン</span>
-          <select id="tts-engine-select" onchange="onEngineChange()">
-            <option value="openai">OpenAI TTS（高品質）</option>
-            <option value="browser">ブラウザ内蔵</option>
-          </select>
-        </div>
-        <div id="openai-voice-row" class="tts-row">
-          <span class="tts-lbl">声</span>
-          <select id="openai-voice-select">
-            <option value="alloy">Alloy</option>
-            <option value="echo">Echo</option>
-            <option value="fable">Fable</option>
-            <option value="onyx">Onyx</option>
-            <option value="nova" selected>Nova</option>
-            <option value="shimmer">Shimmer</option>
-          </select>
-        </div>
-        <div id="browser-voice-row" class="tts-row hidden">
-          <span class="tts-lbl">音声</span>
-          <select id="voice-select" onchange="onVoiceChange()"></select>
-          <span class="quality-pill hidden" id="voice-quality-tag"></span>
-        </div>
-        <div class="tts-row">
-          <span class="tts-lbl">速度</span>
-          <select id="speed-select" style="max-width:120px;">
-            <option value="0.8">0.8×</option>
-            <option value="0.9">0.9×</option>
-            <option value="1.0" selected>1.0×</option>
-            <option value="1.1">1.1×</option>
-            <option value="1.2">1.2×</option>
-          </select>
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-head">
-        <div class="card-title">🃏 Key phrases & structures</div>
-        <span class="tag" id="phrase-total"></span>
-      </div>
-      <div class="tabs">
-        <button class="tab active" onclick="switchTab('flashcard',this)">Flashcard</button>
-        <button class="tab" onclick="switchTab('list',this)">List view</button>
-      </div>
-      <div id="flashcard-view">
-        <div class="fc-wrap">
-          <div class="fc" id="flashcard" onclick="flipCard()">
-            <div class="fc-face fc-front">
-              <div class="fc-sublabel">phrase / structure</div>
-              <div class="fc-phrase" id="fc-phrase">—</div>
+    <div class="layout-cols">
+      <!-- 左カラム：スクリプト -->
+      <div class="col-script">
+        <div class="card">
+          <div class="card-head">
+            <div class="card-title">📄 Script</div>
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+              <span class="tag" id="word-count"></span>
+              <button class="btn btn-sm" onclick="openArchiveModal()">📦 アーカイブ</button>
+              <button class="btn btn-sm" onclick="showInputView()">✏️ 更新</button>
             </div>
-            <div class="fc-face fc-back">
-              <div class="fc-sublabel">meaning & usage</div>
-              <div class="fc-meaning" id="fc-meaning">—</div>
-              <div class="fc-example" id="fc-example">—</div>
+          </div>
+
+          <!-- Script mode toggle -->
+          <div class="script-mode-toggle">
+            <button class="mode-btn active" id="mode-btn-normal" onclick="switchScriptMode('normal')">📖 通常</button>
+            <button class="mode-btn" id="mode-btn-pron" onclick="switchScriptMode('pron')">🗣 発音ガイド</button>
+          </div>
+
+          <!-- Normal view -->
+          <div id="script-normal">
+            <div class="script-text" id="script-display"></div>
+          </div>
+
+          <!-- Pronunciation view -->
+          <div id="script-pron" class="hidden">
+            <div class="pron-legend">
+              <span class="legend-content">■ 内容語（強く）</span>
+              <span class="legend-function">■ 機能語（弱く）</span>
+              <span class="legend-stress">下線 = 主音節</span>
+            </div>
+            <div id="pron-loading" class="hidden" style="text-align:center;padding:1.5rem;font-size:13px;color:var(--text-3);">🗣 発音ガイドを生成中...</div>
+            <div class="script-text pron-text" id="pron-display"></div>
+          </div>
+
+          <div class="tts-section">
+            <div class="tts-row">
+              <button class="btn btn-play" id="play-btn" onclick="toggleTTS()">
+                <span id="play-icon">▶</span><span id="play-label">Play</span>
+              </button>
+              <div class="prog-wrap"><div class="prog-bar" id="progress-bar"></div></div>
+              <button class="btn btn-repeat" id="repeat-btn" onclick="toggleRepeat()" title="繰り返し再生">🔁</button>
+            </div>
+            <div class="tts-row">
+              <span class="tts-lbl">エンジン</span>
+              <select id="tts-engine-select" onchange="onEngineChange()">
+                <option value="openai">OpenAI TTS（高品質）</option>
+                <option value="browser">ブラウザ内蔵</option>
+              </select>
+            </div>
+            <div id="openai-voice-row" class="tts-row">
+              <span class="tts-lbl">声</span>
+              <select id="openai-voice-select">
+                <option value="alloy">Alloy</option>
+                <option value="echo">Echo</option>
+                <option value="fable">Fable</option>
+                <option value="onyx">Onyx</option>
+                <option value="nova" selected>Nova</option>
+                <option value="shimmer">Shimmer</option>
+              </select>
+            </div>
+            <div id="browser-voice-row" class="tts-row hidden">
+              <span class="tts-lbl">音声</span>
+              <select id="voice-select" onchange="onVoiceChange()"></select>
+              <span class="quality-pill hidden" id="voice-quality-tag"></span>
+            </div>
+            <div class="tts-row">
+              <span class="tts-lbl">速度</span>
+              <select id="speed-select" style="max-width:120px;">
+                <option value="0.8">0.8×</option>
+                <option value="0.9">0.9×</option>
+                <option value="1.0" selected>1.0×</option>
+                <option value="1.1">1.1×</option>
+                <option value="1.2">1.2×</option>
+              </select>
             </div>
           </div>
         </div>
-        <div class="fc-hint">カードをタップして裏返す</div>
-        <div class="fc-nav">
-          <button class="btn btn-nav" onclick="prevCard()">← 前へ</button>
-          <span class="fc-count" id="fc-counter">0 / 0</span>
-          <button class="btn btn-nav" onclick="nextCard()">次へ →</button>
+      </div><!-- /col-script -->
+
+      <!-- 右カラム：フレーズカード -->
+      <div class="col-side">
+        <div class="card">
+          <div class="card-head">
+            <div class="card-title">🃏 Key phrases & structures</div>
+            <span class="tag" id="phrase-total"></span>
+          </div>
+          <div class="tabs">
+            <button class="tab active" onclick="switchTab('flashcard',this)">Flashcard</button>
+            <button class="tab" onclick="switchTab('list',this)">List view</button>
+          </div>
+          <div id="flashcard-view">
+            <div class="fc-wrap">
+              <div class="fc" id="flashcard" onclick="flipCard()">
+                <div class="fc-face fc-front">
+                  <div class="fc-sublabel">phrase / structure</div>
+                  <div class="fc-phrase" id="fc-phrase">—</div>
+                </div>
+                <div class="fc-face fc-back">
+                  <div class="fc-sublabel">meaning & usage</div>
+                  <div class="fc-meaning" id="fc-meaning">—</div>
+                  <div class="fc-example" id="fc-example">—</div>
+                </div>
+              </div>
+            </div>
+            <div class="fc-hint">カードをタップして裏返す</div>
+            <div class="fc-nav">
+              <button class="btn btn-nav" onclick="prevCard()">← 前へ</button>
+              <span class="fc-count" id="fc-counter">0 / 0</span>
+              <button class="btn btn-nav" onclick="nextCard()">次へ →</button>
+            </div>
+          </div>
+          <div id="list-view" class="hidden"><div id="phrase-list"></div></div>
         </div>
-      </div>
-      <div id="list-view" class="hidden"><div id="phrase-list"></div></div>
-    </div>
+      </div><!-- /col-side -->
+    </div><!-- /layout-cols -->
   </div>
 </div>
 
