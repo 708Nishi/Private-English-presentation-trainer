@@ -790,6 +790,10 @@ ${script}
     words.forEach(w => {
       if (w.type === 'punct') {
         html += `<span>${w.word}</span>`;
+        // センテンス末尾の句読点の後に改行を挿入
+        if (/^[.!?]$/.test(w.word)) {
+          html += '<br><br>';
+        }
       } else if (w.type === 'function') {
         html += `<span class="w-function">${w.word}</span> `;
       } else {
