@@ -730,24 +730,24 @@ async function generatePronGuide(script) {
   document.getElementById('pron-loading').classList.remove('hidden');
   document.getElementById('pron-display').innerHTML = '';
 
-  const prompt = `You are an English pronunciation coach. Analyze the following script and mark each word for pronunciation practice.
+  const prompt = `You are an English pronunciation coach. Analyze the following script word by word.
 
-For EACH word, classify it and return a JSON array of word objects. No markdown, no backticks. Return only the JSON array.
+For each word, return a JSON array. No markdown, no backticks. Return ONLY the JSON array.
 
 Rules:
 - Content words (nouns, main verbs, adjectives, adverbs): type="content"
 - Function words (articles, prepositions, conjunctions, auxiliary verbs, pronouns, determiners): type="function"
-- For content words, mark the stressed syllable by wrapping it in <s> tags within the "display" field
-  Example: "contribute" → display: "con·tri·<s>bute</s>"
-  Example: "research" → display: "re·<s>search</s>"
-  Example: "chronic" → display: "<s>chron</s>·ic"
-- For function words, just use the plain word in "display"
-- Preserve punctuation as separate entries with type="punct"
+- Punctuation marks: type="punct"
+- For content words, indicate the stressed syllable index (0-based) in "stress" field, and syllables as array in "syllables" field
+  Example: "research" → syllables:["re","search"], stress:1
+  Example: "chronic" → syllables:["chron","ic"], stress:0
+  Example: "contribute" → syllables:["con","trib","ute"], stress:1
+- For function words and punct, syllables:[], stress:-1
 
-Return format (array of objects):
-[{"word":"the","display":"the","type":"function"},{"word":"research","display":"re·<s>search</s>","type":"content"},{"word":"focuses","display":"<s>fo</s>·cus·es","type":"content"},{"word":"on","display":"on","type":"function"}]
+Return format:
+[{"word":"the","syllables":[],"stress":-1,"type":"function"},{"word":"research","syllables":["re","search"],"stress":1,"type":"content"}]
 
-Script to analyze:
+Script:
 """
 ${script}
 """`;
@@ -775,17 +775,26 @@ ${script}
     if (!match) throw new Error(`解析失敗：${raw.slice(0, 120)}`);
     const words = JSON.parse(match[0]);
 
-    // HTMLに変換
+    // HTMLに変換（JS側でHTMLを組み立て）
     let html = '';
     words.forEach(w => {
       if (w.type === 'punct') {
-        html += `<span>${w.display}</span>`;
+        html += `<span>${w.word}</span>`;
       } else if (w.type === 'function') {
-        html += `<span class="w-function">${w.display}</span> `;
+        html += `<span class="w-function">${w.word}</span> `;
       } else {
-        // contentWordの<s>タグをspanに変換
-        const disp = w.display.replace(/<s>(.*?)<\/s>/g, '<span class="stressed">$1</span>');
-        html += `<span class="w-content">${disp}</span> `;
+        // 音節を組み立て、主音節にunderlineを付与
+        let display;
+        if (w.syllables && w.syllables.length > 1) {
+          display = w.syllables.map((syl, i) =>
+            i === w.stress
+              ? `<span class="stressed">${syl}</span>`
+              : syl
+          ).join('·');
+        } else {
+          display = w.word;
+        }
+        html += `<span class="w-content">${display}</span> `;
       }
     });
 
