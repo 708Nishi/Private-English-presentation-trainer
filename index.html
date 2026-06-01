@@ -772,8 +772,18 @@ ${script}
     if (apiData.type === 'error') throw new Error(apiData.error?.message);
     const raw = (apiData.content || []).map(b => b.text || '').join('').trim();
     const match = raw.match(/\[[\s\S]*\]/);
-    if (!match) throw new Error(`解析失敗：${raw.slice(0, 120)}`);
-    const words = JSON.parse(match[0]);
+    if (!match) throw new Error(`JSON配列が見つかりません：${raw.slice(0, 200)}`);
+
+    // パース前に問題箇所を特定
+    let words;
+    try {
+      words = JSON.parse(match[0]);
+    } catch(parseErr) {
+      // 問題箇所周辺を表示
+      const pos = parseInt(parseErr.message.match(/position (\d+)/)?.[1] || '0');
+      const snippet = match[0].slice(Math.max(0, pos-30), pos+30);
+      throw new Error(`JSON解析エラー at pos ${pos}: ...${snippet}...`);
+    }
 
     // HTMLに変換（JS側でHTMLを組み立て）
     let html = '';
