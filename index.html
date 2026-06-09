@@ -6,90 +6,61 @@
 <title>Weekly Presentation Trainer</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;1,400&family=DM+Mono&display=swap');
-  :root {
-    --purple:#7F77DD; --purple-dark:#534AB7; --purple-deeper:#3C3489;
-    --purple-light:#EEEDFE; --purple-mid:#CECBF6; --purple-border:#AFA9EC;
-    --bg:#F5F4F0; --card:#FFFFFF; --text:#1A1A1A; --text-2:#555; --text-3:#999;
-    --border:#1A1A1A; --border-light:#D5D3DC; --radius:10px;
-    --warn:#BA7517; --danger:#C0392B; --danger-bg:#FEF0EE;
-    --success:#1A7A4A; --success-bg:#EDFAF3;
+  :root{
+    --purple:#7F77DD;--purple-dark:#534AB7;--purple-deeper:#3C3489;
+    --purple-light:#EEEDFE;--purple-mid:#CECBF6;--purple-border:#AFA9EC;
+    --bg:#F5F4F0;--card:#FFFFFF;--text:#1A1A1A;--text-2:#555;--text-3:#999;
+    --border:#1A1A1A;--border-light:#D5D3DC;--radius:10px;
+    --warn:#BA7517;--danger:#C0392B;--danger-bg:#FEF0EE;
+    --success:#1A7A4A;--success-bg:#EDFAF3;
   }
   *{box-sizing:border-box;margin:0;padding:0;}
   body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
   .page{max-width:1920px;margin:0 auto;padding:2rem 2rem 5rem;}
 
-  /* PC幅では左右2カラム：スクリプト | フレーズ/設定 */
   @media(min-width:720px){
     .layout-cols{display:grid;grid-template-columns:1fr 420px;gap:1.25rem;align-items:start;}
-    .col-script{min-width:0;}
-    .col-side{min-width:0;}
+    .col-script,.col-side{min-width:0;}
   }
-  @media(max-width:719px){
-    .layout-cols{display:block;}
-  }
+  @media(max-width:719px){.layout-cols{display:block;}}
 
-  /* ── Nav tabs ── */
-  .nav{display:flex;gap:4px;background:var(--card);border:1.5px solid var(--border);
-    border-radius:12px;padding:4px;margin-bottom:1.5rem;}
-  .nav-tab{flex:1;font-size:13px;font-weight:500;padding:8px 4px;border:none;
-    border-radius:8px;background:transparent;color:var(--text-3);cursor:pointer;
-    font-family:'DM Sans',sans-serif;transition:all 0.15s;}
+  .nav{display:flex;gap:4px;background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:4px;margin-bottom:1.5rem;}
+  .nav-tab{flex:1;font-size:13px;font-weight:500;padding:8px 4px;border:none;border-radius:8px;background:transparent;color:var(--text-3);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s;}
   .nav-tab.active{background:var(--purple);color:#fff;}
 
-  /* ── Header ── */
   .header{margin-bottom:1.5rem;}
-  .week-badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;
-    color:var(--purple-deeper);background:var(--purple-light);border:1.5px solid var(--purple-border);
-    border-radius:20px;padding:3px 12px;margin-bottom:10px;}
+  .week-badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;color:var(--purple-deeper);background:var(--purple-light);border:1.5px solid var(--purple-border);border-radius:20px;padding:3px 12px;margin-bottom:10px;}
   .header h1{font-size:21px;font-weight:500;letter-spacing:-0.4px;}
   .header p{font-size:13px;color:var(--text-2);margin-top:4px;}
 
-  /* ── Settings bar ── */
   .settings-bar{display:flex;align-items:center;gap:6px;margin-bottom:1.25rem;flex-wrap:wrap;}
-  .key-status{display:inline-flex;align-items:center;font-size:11px;padding:3px 8px;
-    border-radius:20px;border:1px solid;}
+  .key-status{display:inline-flex;align-items:center;font-size:11px;padding:3px 8px;border-radius:20px;border:1px solid;}
   .key-status.ok{color:var(--success);background:var(--success-bg);border-color:#9FE1CB;}
   .key-status.ng{color:var(--danger);background:var(--danger-bg);border-color:#F5C6C4;}
-  .btn-settings{font-size:12px;padding:4px 10px;border:1.5px solid var(--border);
-    border-radius:8px;background:var(--card);color:var(--text-2);cursor:pointer;font-family:'DM Sans',sans-serif;}
+  .btn-settings{font-size:12px;padding:4px 10px;border:1.5px solid var(--border);border-radius:8px;background:var(--card);color:var(--text-2);cursor:pointer;font-family:'DM Sans',sans-serif;}
   .btn-settings:hover{background:var(--bg);}
 
-  /* ── Modal ── */
-  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);
-    display:flex;align-items:center;justify-content:center;z-index:100;padding:1rem;}
-  .modal{background:var(--card);border:2px solid var(--border);border-radius:14px;
-    padding:1.75rem;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;}
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);display:flex;align-items:center;justify-content:center;z-index:100;padding:1rem;}
+  .modal{background:var(--card);border:2px solid var(--border);border-radius:14px;padding:1.75rem;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;}
   .modal h2{font-size:17px;font-weight:500;margin-bottom:4px;}
   .modal p{font-size:12px;color:var(--text-2);margin-bottom:1.25rem;line-height:1.6;}
   .modal-field{margin-bottom:1rem;}
-  .modal-label{font-size:11px;font-weight:500;letter-spacing:0.07em;text-transform:uppercase;
-    color:var(--text-3);margin-bottom:6px;display:block;}
-  .modal-input{width:100%;font-family:'DM Mono',monospace;font-size:12px;
-    padding:9px 12px;border:2px solid var(--border);border-radius:8px;background:#FAFAF9;color:var(--text);}
+  .modal-label{font-size:11px;font-weight:500;letter-spacing:0.07em;text-transform:uppercase;color:var(--text-3);margin-bottom:6px;display:block;}
+  .modal-input{width:100%;font-family:'DM Mono',monospace;font-size:12px;padding:9px 12px;border:2px solid var(--border);border-radius:8px;background:#FAFAF9;color:var(--text);}
   .modal-input:focus{outline:none;border-color:var(--purple);box-shadow:0 0 0 3px var(--purple-light);}
   .modal-row{display:flex;gap:8px;justify-content:flex-end;margin-top:1.25rem;}
 
-  /* ── Card ── */
-  .card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);
-    padding:1.25rem;margin-bottom:1.25rem;}
+  .card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-bottom:1.25rem;}
   .card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;}
   .card-title{font-size:14px;font-weight:500;display:flex;align-items:center;gap:7px;}
-  .tag{font-size:12px;font-weight:500;background:var(--purple-light);border:1px solid var(--purple-border);
-    color:var(--purple-deeper);border-radius:20px;padding:2px 10px;white-space:nowrap;}
-  .hint{background:var(--bg);border:1px solid var(--border-light);border-radius:8px;
-    padding:10px 14px;font-size:12px;color:var(--text-2);line-height:1.7;margin-bottom:12px;}
-  .divider{height:1px;background:var(--border-light);margin:1rem 0;}
+  .tag{font-size:12px;font-weight:500;background:var(--purple-light);border:1px solid var(--purple-border);color:var(--purple-deeper);border-radius:20px;padding:2px 10px;white-space:nowrap;}
+  .hint{background:var(--bg);border:1px solid var(--border-light);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--text-2);line-height:1.7;margin-bottom:12px;}
 
-  /* ── Step ── */
   .step-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
-  .step-num{width:24px;height:24px;border-radius:50%;background:var(--purple);color:#fff;
-    font-size:12px;font-weight:500;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .step-num{width:24px;height:24px;border-radius:50%;background:var(--purple);color:#fff;font-size:12px;font-weight:500;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
   .step-label{font-size:13px;font-weight:500;}
 
-  /* ── Textarea / Input ── */
-  textarea,input[type=text]{width:100%;font-family:'DM Sans',sans-serif;font-size:14px;
-    line-height:1.8;color:var(--text);background:#FAFAF9;border:2px solid var(--border);
-    border-radius:8px;padding:10px 14px;transition:border-color 0.15s,box-shadow 0.15s;}
+  textarea,input[type=text]{width:100%;font-family:'DM Sans',sans-serif;font-size:14px;line-height:1.8;color:var(--text);background:#FAFAF9;border:2px solid var(--border);border-radius:8px;padding:10px 14px;transition:border-color 0.15s,box-shadow 0.15s;}
   textarea{resize:vertical;}
   textarea:focus,input[type=text]:focus{outline:none;border-color:var(--purple);box-shadow:0 0 0 3px var(--purple-light);}
   textarea::placeholder,input::placeholder{color:var(--text-3);}
@@ -97,16 +68,13 @@
   .word-counter{font-size:12px;color:var(--text-3);text-align:right;margin-top:5px;}
   .word-counter.warn{color:var(--warn);}
 
-  /* ── Buttons ── */
-  .btn{display:inline-flex;align-items:center;gap:6px;border-radius:8px;font-size:13px;
-    font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s;}
+  .btn{display:inline-flex;align-items:center;gap:6px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s;}
   .btn-primary{padding:9px 22px;background:var(--purple);border:none;color:#fff;}
   .btn-primary:hover{background:var(--purple-dark);}
   .btn-primary:disabled{background:var(--border-light);cursor:not-allowed;}
   .btn-outline{padding:6px 14px;background:transparent;border:1.5px solid var(--border);color:var(--text-2);}
   .btn-outline:hover{background:var(--bg);}
-  .btn-play{padding:8px 18px;background:var(--purple-light);border:1.5px solid var(--purple-border);
-    color:var(--purple-deeper);white-space:nowrap;}
+  .btn-play{padding:8px 18px;background:var(--purple-light);border:1.5px solid var(--purple-border);color:var(--purple-deeper);white-space:nowrap;}
   .btn-play:hover{background:var(--purple-mid);}
   .btn-nav{padding:9px 20px;background:var(--card);border:1.5px solid var(--border);color:var(--text);}
   .btn-nav:hover{background:var(--bg);}
@@ -114,74 +82,48 @@
   .btn-sm:hover{background:var(--bg);}
   .btn-danger-sm{padding:4px 10px;font-size:12px;background:transparent;border:1px solid var(--danger);color:var(--danger);}
   .btn-danger-sm:hover{background:var(--danger-bg);}
-  .btn-repeat{padding:7px 11px;font-size:15px;background:transparent;border:1.5px solid var(--border-light);
-    border-radius:8px;color:var(--text-3);flex-shrink:0;transition:all 0.15s;}
+  .btn-repeat{padding:7px 11px;font-size:15px;background:transparent;border:1.5px solid var(--border-light);border-radius:8px;color:var(--text-3);flex-shrink:0;transition:all 0.15s;}
   .btn-repeat:hover{background:var(--bg);}
   .btn-repeat.active{background:var(--purple-light);border-color:var(--purple-border);color:var(--purple-deeper);}
   .row{display:flex;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap;}
   .ml-auto{margin-left:auto;}
 
-  /* ── Saved banner ── */
-  .saved-banner{background:var(--success-bg);border:1.5px solid #9FE1CB;border-radius:8px;
-    padding:10px 14px;margin-bottom:12px;font-size:13px;color:var(--success);
-    display:flex;align-items:center;justify-content:space-between;gap:8px;}
+  .saved-banner{background:var(--success-bg);border:1.5px solid #9FE1CB;border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:13px;color:var(--success);display:flex;align-items:center;justify-content:space-between;gap:8px;}
 
-  /* ── Script mode toggle ── */
-  .script-mode-toggle{display:flex;gap:4px;background:var(--bg);border:1.5px solid var(--border-light);
-    border-radius:10px;padding:4px;margin-bottom:1rem;}
-  .mode-btn{flex:1;font-size:13px;font-weight:500;padding:6px;border:none;border-radius:7px;
-    background:transparent;color:var(--text-3);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s;}
+  .script-mode-toggle{display:flex;gap:4px;background:var(--bg);border:1.5px solid var(--border-light);border-radius:10px;padding:4px;margin-bottom:1rem;}
+  .mode-btn{flex:1;font-size:13px;font-weight:500;padding:6px;border:none;border-radius:7px;background:transparent;color:var(--text-3);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s;}
   .mode-btn.active{background:var(--card);color:var(--text);border:1.5px solid var(--border);}
 
-  /* ── Pronunciation legend ── */
-  .pron-legend{display:flex;align-items:center;gap:12px;flex-wrap:wrap;
-    font-size:11px;margin-bottom:10px;padding:6px 10px;
-    background:var(--bg);border-radius:8px;border:1px solid var(--border-light);}
+  .pron-legend{display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-size:11px;margin-bottom:10px;padding:6px 10px;background:var(--bg);border-radius:8px;border:1px solid var(--border-light);}
   .legend-content{color:var(--text);font-weight:600;}
   .legend-function{color:var(--text-3);}
   .legend-stress{color:var(--purple-dark);text-decoration:underline;text-underline-offset:3px;}
-
-  /* ── Pronunciation text ── */
   .pron-text{line-height:2.1;}
   .w-content{font-weight:700;font-size:1.05em;color:var(--text);}
   .w-content .stressed{text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--purple);text-decoration-thickness:2px;}
   .w-function{color:var(--text-3);font-size:0.88em;font-weight:400;}
 
-  /* ── Script display ── */
   .script-text{font-size:14px;line-height:1.9;color:var(--text);}
-  .script-text mark{background:var(--purple-light);color:var(--purple-deeper);
-    border-bottom:2px solid var(--purple);border-radius:3px;padding:1px 2px;
-    font-weight:500;cursor:pointer;transition:background 0.15s;}
+  .script-text mark{background:var(--purple-light);color:var(--purple-deeper);border-bottom:2px solid var(--purple);border-radius:3px;padding:1px 2px;font-weight:500;cursor:pointer;transition:background 0.15s;}
   .script-text mark:hover{background:var(--purple-mid);}
 
-  /* ── TTS ── */
-  .tts-section{margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border-light);
-    display:flex;flex-direction:column;gap:10px;}
+  .tts-section{margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border-light);display:flex;flex-direction:column;gap:10px;}
   .tts-row{display:flex;align-items:center;gap:8px;}
   .tts-lbl{font-size:11px;color:var(--text-3);white-space:nowrap;min-width:34px;}
   .prog-wrap{flex:1;height:4px;background:var(--bg);border-radius:2px;overflow:hidden;min-width:40px;}
   .prog-bar{height:100%;width:0%;background:var(--purple);border-radius:2px;transition:width 0.3s;}
-  select{font-family:'DM Sans',sans-serif;font-size:12px;padding:5px 8px;
-    border:1.5px solid var(--border);border-radius:8px;background:var(--card);
-    color:var(--text);cursor:pointer;flex:1;min-width:0;}
+  select{font-family:'DM Sans',sans-serif;font-size:12px;padding:5px 8px;border:1.5px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);cursor:pointer;flex:1;min-width:0;}
   select:focus{outline:none;border-color:var(--purple);}
-  .quality-pill{font-size:11px;font-weight:500;color:var(--purple-deeper);background:var(--purple-mid);
-    border-radius:20px;padding:2px 10px;white-space:nowrap;flex-shrink:0;}
+  .quality-pill{font-size:11px;font-weight:500;color:var(--purple-deeper);background:var(--purple-mid);border-radius:20px;padding:2px 10px;white-space:nowrap;flex-shrink:0;}
 
-  /* ── Tabs (flashcard/list) ── */
-  .tabs{display:flex;gap:4px;background:var(--bg);border:1.5px solid var(--border-light);
-    border-radius:10px;padding:4px;margin-bottom:1rem;}
-  .tab{flex:1;font-size:13px;font-weight:500;padding:7px;border:none;border-radius:7px;
-    background:transparent;color:var(--text-3);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s;}
+  .tabs{display:flex;gap:4px;background:var(--bg);border:1.5px solid var(--border-light);border-radius:10px;padding:4px;margin-bottom:1rem;}
+  .tab{flex:1;font-size:13px;font-weight:500;padding:7px;border:none;border-radius:7px;background:transparent;color:var(--text-3);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s;}
   .tab.active{background:var(--card);color:var(--text);border:1.5px solid var(--border);}
 
-  /* ── Flashcard ── */
   .fc-wrap{perspective:900px;max-width:520px;margin:0 auto;}
-  .fc{width:100%;height:210px;position:relative;transform-style:preserve-3d;
-    transition:transform 0.45s cubic-bezier(0.4,0,0.2,1);cursor:pointer;}
+  .fc{width:100%;height:210px;position:relative;transform-style:preserve-3d;transition:transform 0.45s cubic-bezier(0.4,0,0.2,1);cursor:pointer;}
   .fc.flipped{transform:rotateY(180deg);}
-  .fc-face{position:absolute;inset:0;backface-visibility:hidden;border-radius:var(--radius);
-    display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.5rem;text-align:center;}
+  .fc-face{position:absolute;inset:0;backface-visibility:hidden;border-radius:var(--radius);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.5rem;text-align:center;}
   .fc-front{background:var(--purple-light);border:2px solid var(--purple);}
   .fc-back{background:#FAFAF9;border:2px solid var(--border);transform:rotateY(180deg);}
   .fc-sublabel{font-size:10px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;margin-bottom:10px;}
@@ -190,54 +132,42 @@
   .fc-phrase{font-size:16px;font-weight:500;color:var(--purple-deeper);line-height:1.4;}
   .fc-meaning{font-size:13px;color:var(--text-2);line-height:1.65;}
   .fc-example{font-size:12px;color:var(--text-3);font-style:italic;margin-top:8px;line-height:1.5;}
+  .fc-source{font-size:10px;color:var(--purple-border);margin-top:6px;}
   .fc-hint{font-size:12px;color:var(--text-3);text-align:center;margin-top:8px;}
   .fc-nav{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:1rem;}
   .fc-count{font-size:13px;color:var(--text-2);min-width:50px;text-align:center;}
 
-  /* ── Phrase list ── */
   .phrase-item{padding:13px 0;border-bottom:1px solid var(--border-light);}
   .phrase-item:last-child{border-bottom:none;}
-  .phrase-pill{display:inline-block;font-size:13px;font-weight:500;color:var(--purple-deeper);
-    background:var(--purple-light);border:1.5px solid var(--purple-border);
-    border-radius:8px;padding:3px 10px;margin-bottom:6px;}
+  .phrase-pill{display:inline-block;font-size:13px;font-weight:500;color:var(--purple-deeper);background:var(--purple-light);border:1.5px solid var(--purple-border);border-radius:8px;padding:3px 10px;margin-bottom:6px;}
+  .phrase-source{font-size:11px;color:var(--text-3);margin-left:6px;}
   .phrase-meaning{font-size:13px;color:var(--text-2);line-height:1.65;margin-bottom:4px;}
   .phrase-example{font-size:12px;color:var(--text-3);font-style:italic;}
 
-  /* ── Archive ── */
-  .archive-item{padding:12px 14px;border:1.5px solid var(--border-light);border-radius:8px;
-    margin-bottom:8px;cursor:pointer;transition:all 0.15s;}
+  .archive-item{padding:12px 14px;border:1.5px solid var(--border-light);border-radius:8px;margin-bottom:8px;cursor:pointer;transition:all 0.15s;}
   .archive-item:hover{border-color:var(--purple-border);background:var(--purple-light);}
   .archive-date{font-size:11px;color:var(--text-3);margin-bottom:4px;}
   .archive-summary{font-size:13px;color:var(--text);line-height:1.5;}
   .archive-meta{font-size:11px;color:var(--text-3);margin-top:4px;}
 
-  /* ── Vocabulary ── */
   .vocab-input-row{display:flex;gap:8px;margin-bottom:1rem;}
   .vocab-input-row input{flex:1;}
-  .vocab-item{padding:12px 0;border-bottom:1px solid var(--border-light);
-    display:flex;align-items:flex-start;justify-content:space-between;gap:8px;}
+  .vocab-item{padding:12px 0;border-bottom:1px solid var(--border-light);display:flex;align-items:flex-start;justify-content:space-between;gap:8px;}
   .vocab-item:last-child{border-bottom:none;}
   .vocab-word{font-size:14px;font-weight:500;color:var(--purple-deeper);}
   .vocab-pron{font-size:12px;color:var(--text-3);font-family:'DM Mono',monospace;margin-top:2px;}
   .vocab-meaning{font-size:13px;color:var(--text-2);line-height:1.6;margin-top:4px;}
   .vocab-example{font-size:12px;color:var(--text-3);font-style:italic;margin-top:3px;}
-  .vocab-youglish{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:500;
-    color:var(--purple-dark);text-decoration:none;margin-top:6px;
-    padding:3px 8px;border:1px solid var(--purple-border);border-radius:20px;background:var(--purple-light);}
+  .vocab-youglish{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:500;color:var(--purple-dark);text-decoration:none;margin-top:6px;padding:3px 8px;border:1px solid var(--purple-border);border-radius:20px;background:var(--purple-light);}
   .vocab-youglish:hover{background:var(--purple-mid);}
   .fc-pron{font-size:13px;color:var(--purple-dark);font-family:'DM Mono',monospace;margin-top:6px;}
-  .fc-youglish{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:500;
-    color:var(--purple-dark);text-decoration:none;margin-top:10px;
-    padding:3px 10px;border:1.5px solid var(--purple-border);border-radius:20px;background:rgba(255,255,255,0.7);}
+  .fc-youglish{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:500;color:var(--purple-dark);text-decoration:none;margin-top:10px;padding:3px 10px;border:1.5px solid var(--purple-border);border-radius:20px;background:rgba(255,255,255,0.7);}
   .fc-youglish:hover{background:var(--purple-mid);}
   .vocab-fc-wrap{perspective:900px;max-width:520px;margin:0 auto;}
-  .vocab-fc{width:100%;height:180px;position:relative;transform-style:preserve-3d;
-    transition:transform 0.45s cubic-bezier(0.4,0,0.2,1);cursor:pointer;}
+  .vocab-fc{width:100%;height:180px;position:relative;transform-style:preserve-3d;transition:transform 0.45s cubic-bezier(0.4,0,0.2,1);cursor:pointer;}
   .vocab-fc.flipped{transform:rotateY(180deg);}
 
-  /* ── Error / misc ── */
-  .error-box{font-size:13px;color:var(--danger);background:var(--danger-bg);
-    border:1px solid #F5C6C4;border-radius:8px;padding:10px 14px;margin-top:8px;}
+  .error-box{font-size:13px;color:var(--danger);background:var(--danger-bg);border:1px solid #F5C6C4;border-radius:8px;padding:10px 14px;margin-top:8px;}
   .empty-msg{text-align:center;padding:2rem 1rem;font-size:13px;color:var(--text-3);}
   .hidden{display:none;}
 
@@ -248,10 +178,10 @@
     #script-input{min-height:160px;}
     .btn-primary{width:100%;justify-content:center;padding:11px;}
     .ml-auto{margin-left:0;width:100%;}
-    .fc{height:230px;} .fc-phrase{font-size:15px;}
+    .fc{height:230px;}.fc-phrase{font-size:15px;}
     .btn-nav{padding:11px 16px;flex:1;justify-content:center;}
     .fc-nav{gap:8px;width:100%;}
-    .tts-row{flex-wrap:wrap;} select{min-width:0;}
+    .tts-row{flex-wrap:wrap;}select{min-width:0;}
     .tab{font-size:12px;padding:8px 4px;}
     .nav-tab{font-size:12px;padding:7px 2px;}
   }
@@ -284,7 +214,7 @@
   </div>
 </div>
 
-<!-- Archive viewer Modal -->
+<!-- Archive Modal -->
 <div class="modal-overlay hidden" id="archive-modal">
   <div class="modal">
     <h2>📦 アーカイブ</h2>
@@ -300,7 +230,7 @@
 <div class="header">
   <div class="week-badge">📅 <span id="week-label"></span></div>
   <h1>Weekly Presentation Trainer</h1>
-  <p>スクリプト · リスニング · フレーズ · 単語帳 <span style="font-size:11px;color:var(--text-3);margin-left:6px;">v1.7.5</span></p>
+  <p>スクリプト · リスニング · フレーズ · 単語帳 <span style="font-size:11px;color:var(--text-3);margin-left:6px;">v1.8.0</span></p>
 </div>
 
 <!-- Settings bar -->
@@ -313,14 +243,13 @@
 
 <!-- Nav -->
 <div class="nav">
-  <button class="nav-tab active" onclick="switchPage('script', this)">📄 スクリプト</button>
-  <button class="nav-tab" onclick="switchPage('vocab', this)">📚 単語帳</button>
+  <button class="nav-tab active" onclick="switchPage('script',this)">📄 スクリプト</button>
+  <button class="nav-tab" onclick="switchPage('phrases',this)">🃏 フレーズ帳</button>
+  <button class="nav-tab" onclick="switchPage('vocab',this)">📚 単語帳</button>
 </div>
 
-<!-- ===================== PAGE: SCRIPT ===================== -->
+<!-- ====== PAGE: SCRIPT ====== -->
 <div id="page-script">
-
-  <!-- Input view -->
   <div id="view-input">
     <div id="saved-banner" class="saved-banner hidden">
       <span>✅ <span id="saved-script-info"></span></span>
@@ -329,7 +258,6 @@
         <button class="btn btn-sm" onclick="loadSavedData()">読み込む</button>
       </div>
     </div>
-
     <div class="step-row"><div class="step-num">1</div><div class="step-label">スクリプトを入力する</div></div>
     <div class="card">
       <div class="card-head">
@@ -339,7 +267,6 @@
       <textarea id="script-input" placeholder="英語のプレゼンスクリプトをここに貼り付けてください..."></textarea>
       <div class="word-counter" id="word-hint">目安：280〜320語（約2〜2.5分）</div>
     </div>
-
     <div class="step-row"><div class="step-num">2</div><div class="step-label">フレーズを自動抽出して保存する</div></div>
     <div class="card">
       <div class="hint">「抽出して保存」を押すと、Claudeがキーフレーズを自動抽出しGistに保存します。<strong>現在のスクリプトは自動的にアーカイブされます。</strong></div>
@@ -350,10 +277,8 @@
     </div>
   </div>
 
-  <!-- Result view -->
   <div id="view-result" class="hidden">
     <div class="layout-cols">
-      <!-- 左カラム：スクリプト -->
       <div class="col-script">
         <div class="card">
           <div class="card-head">
@@ -364,19 +289,13 @@
               <button class="btn btn-sm" onclick="showInputView()">✏️ 更新</button>
             </div>
           </div>
-
-          <!-- Script mode toggle -->
           <div class="script-mode-toggle">
             <button class="mode-btn active" id="mode-btn-normal" onclick="switchScriptMode('normal')">📖 通常</button>
             <button class="mode-btn" id="mode-btn-pron" onclick="switchScriptMode('pron')">🗣 発音ガイド</button>
           </div>
-
-          <!-- Normal view -->
           <div id="script-normal">
             <div class="script-text" id="script-display"></div>
           </div>
-
-          <!-- Pronunciation view -->
           <div id="script-pron" class="hidden">
             <div class="pron-legend">
               <span class="legend-content">■ 内容語（強く）</span>
@@ -386,7 +305,6 @@
             <div id="pron-loading" class="hidden" style="text-align:center;padding:1.5rem;font-size:13px;color:var(--text-3);">🗣 発音ガイドを生成中...</div>
             <div class="script-text pron-text" id="pron-display"></div>
           </div>
-
           <div class="tts-section">
             <div class="tts-row">
               <button class="btn btn-play" id="play-btn" onclick="toggleTTS()">
@@ -405,12 +323,12 @@
             <div id="openai-voice-row" class="tts-row">
               <span class="tts-lbl">声</span>
               <select id="openai-voice-select">
-                <option value="alloy">Alloy</option>
-                <option value="echo">Echo</option>
-                <option value="fable">Fable</option>
-                <option value="onyx">Onyx</option>
-                <option value="nova" selected>Nova</option>
-                <option value="shimmer">Shimmer</option>
+                <option value="alloy">Alloy（中性）</option>
+                <option value="echo" selected>Echo（男性・米国）</option>
+                <option value="fable">Fable（英国風）</option>
+                <option value="onyx">Onyx（男性・低め）</option>
+                <option value="nova">Nova（女性）</option>
+                <option value="shimmer">Shimmer（女性・明るめ）</option>
               </select>
             </div>
             <div id="browser-voice-row" class="tts-row hidden">
@@ -430,18 +348,16 @@
             </div>
           </div>
         </div>
-      </div><!-- /col-script -->
-
-      <!-- 右カラム：フレーズカード -->
+      </div>
       <div class="col-side">
         <div class="card">
           <div class="card-head">
-            <div class="card-title">🃏 Key phrases & structures</div>
+            <div class="card-title">🃏 Key phrases</div>
             <span class="tag" id="phrase-total"></span>
           </div>
           <div class="tabs">
             <button class="tab active" onclick="switchTab('flashcard',this)">Flashcard</button>
-            <button class="tab" onclick="switchTab('list',this)">List view</button>
+            <button class="tab" onclick="switchTab('list',this)">List</button>
           </div>
           <div id="flashcard-view">
             <div class="fc-wrap">
@@ -466,24 +382,64 @@
           </div>
           <div id="list-view" class="hidden"><div id="phrase-list"></div></div>
         </div>
-      </div><!-- /col-side -->
-    </div><!-- /layout-cols -->
+      </div>
+    </div>
   </div>
 </div>
 
-<!-- ===================== PAGE: VOCAB ===================== -->
-<div id="page-vocab" class="hidden">
+<!-- ====== PAGE: PHRASES ====== -->
+<div id="page-phrases" class="hidden">
   <div class="card">
     <div class="card-head">
-      <div class="card-title">➕ 単語を追加する</div>
+      <div class="card-title">🃏 フレーズ帳</div>
+      <span class="tag" id="allphrases-total">0 phrases</span>
     </div>
+    <div class="hint" id="allphrases-hint">現在のスクリプトと全アーカイブのフレーズをまとめて復習できます。</div>
+    <div class="tabs">
+      <button class="tab active" onclick="switchAllPhrasesTab('flashcard',this)">Flashcard</button>
+      <button class="tab" onclick="switchAllPhrasesTab('list',this)">List</button>
+    </div>
+    <div id="allphrases-flashcard-view">
+      <div id="allphrases-empty" class="empty-msg">フレーズが読み込まれていません。スクリプトタブで「読み込む」を押してください。</div>
+      <div id="allphrases-fc-area" class="hidden">
+        <div class="fc-wrap">
+          <div class="fc" id="ap-flashcard" onclick="flipAPCard()">
+            <div class="fc-face fc-front">
+              <div class="fc-sublabel">phrase / structure</div>
+              <div class="fc-phrase" id="ap-fc-phrase">—</div>
+              <div class="fc-source" id="ap-fc-source"></div>
+            </div>
+            <div class="fc-face fc-back">
+              <div class="fc-sublabel">meaning & usage</div>
+              <div class="fc-meaning" id="ap-fc-meaning">—</div>
+              <div class="fc-example" id="ap-fc-example">—</div>
+            </div>
+          </div>
+        </div>
+        <div class="fc-hint">カードをタップして裏返す</div>
+        <div class="fc-nav">
+          <button class="btn btn-nav" onclick="prevAPCard()">← 前へ</button>
+          <span class="fc-count" id="ap-fc-counter">0 / 0</span>
+          <button class="btn btn-nav" onclick="nextAPCard()">次へ →</button>
+        </div>
+      </div>
+    </div>
+    <div id="allphrases-list-view" class="hidden">
+      <div id="allphrases-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== PAGE: VOCAB ====== -->
+<div id="page-vocab" class="hidden">
+  <div class="card">
+    <div class="card-head"><div class="card-title">➕ 単語を追加する</div></div>
     <div class="vocab-input-row">
       <input type="text" id="vocab-word-input" placeholder="単語を入力（例：bronchiectasis）" onkeydown="if(event.key==='Enter')addVocab()"/>
       <button class="btn btn-primary" id="vocab-add-btn" onclick="addVocab()" style="white-space:nowrap;padding:8px 16px;">追加</button>
     </div>
     <div id="vocab-error" class="error-box hidden"></div>
   </div>
-
   <div class="card">
     <div class="card-head">
       <div class="card-title">📚 単語帳</div>
@@ -491,9 +447,8 @@
     </div>
     <div class="tabs">
       <button class="tab active" onclick="switchVocabTab('flashcard',this)">Flashcard</button>
-      <button class="tab" onclick="switchVocabTab('list',this)">List view</button>
+      <button class="tab" onclick="switchVocabTab('list',this)">List</button>
     </div>
-
     <div id="vocab-flashcard-view">
       <div id="vocab-empty" class="empty-msg">単語を追加するとフラッシュカードが表示されます</div>
       <div id="vocab-fc-area" class="hidden">
@@ -520,50 +475,40 @@
         </div>
       </div>
     </div>
-
-    <div id="vocab-list-view" class="hidden">
-      <div id="vocab-list"></div>
-    </div>
+    <div id="vocab-list-view" class="hidden"><div id="vocab-list"></div></div>
   </div>
 </div>
 
 </div><!-- .page -->
 <script>
-// ── Config ──
-const GIST_ID = '3e51837baf84554a02befb4235600ca6';
+const GIST_ID='3e51837baf84554a02befb4235600ca6';
 
 // ── State ──
-let phrases=[], cardIndex=0, isFlipped=false;
-let vocabList=[], vocabIndex=0, vocabFlipped=false;
-let utterance=null, isSpeaking=false, progressInterval=null;
-let availableVoices=[], selectedVoice=null;
-let isRepeat=false, lastPlayText='', lastPlaySpeed=1.0;
+let phrases=[],cardIndex=0,isFlipped=false;
+let allPhrases=[],apIndex=0,apFlipped=false;
+let vocabList=[],vocabIndex=0,vocabFlipped=false;
+let isSpeaking=false,progressInterval=null;
+let utterance=null,availableVoices=[],selectedVoice=null;
+let isRepeat=false,lastPlayText='',lastPlaySpeed=1.0,lastPlayVoice='echo';
 let currentAudio=null;
-let currentScript='', pronCacheHtml='';
+let currentScript='',pronCacheHtml='';
 
-// ── Week label ──
-const now=new Date(), yr=now.getFullYear();
-const soy=new Date(yr,0,1);
+// ── Week ──
+const now=new Date(),yr=now.getFullYear(),soy=new Date(yr,0,1);
 const wk=Math.ceil(((now-soy)/86400000+soy.getDay()+1)/7);
 document.getElementById('week-label').textContent=`Week ${wk}, ${yr}`;
 
-// ── Key helpers ──
+// ── Keys ──
 const getAK=()=>localStorage.getItem('pt_anthropic_key')||'';
 const getGH=()=>localStorage.getItem('pt_github_token')||'';
 const getOK=()=>localStorage.getItem('pt_openai_key')||'';
 
 function updateKeyStatus(){
-  const set=(id,val,label)=>{
-    const el=document.getElementById(id);
-    if(val){el.textContent=label+' ✓';el.className='key-status ok';}
-    else{el.textContent=label+': 未設定';el.className='key-status ng';}
-  };
+  const set=(id,val,lbl)=>{const el=document.getElementById(id);if(val){el.textContent=lbl+' ✓';el.className='key-status ok';}else{el.textContent=lbl+': 未設定';el.className='key-status ng';}};
   set('key-status-anthropic',getAK(),'Anthropic');
   set('key-status-openai',getOK(),'OpenAI');
   set('key-status-github',getGH(),'GitHub');
 }
-
-// ── Settings ──
 function openSettings(){
   document.getElementById('input-anthropic-key').value=getAK();
   document.getElementById('input-openai-key').value=getOK();
@@ -578,24 +523,22 @@ function saveSettings(){
   if(ak)localStorage.setItem('pt_anthropic_key',ak);
   if(ok)localStorage.setItem('pt_openai_key',ok);
   if(gh)localStorage.setItem('pt_github_token',gh);
-  updateKeyStatus(); closeSettings();
+  updateKeyStatus();closeSettings();
 }
 
 // ── Page nav ──
 function switchPage(name,btn){
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
   btn.classList.add('active');
-  document.getElementById('page-script').classList.toggle('hidden',name!=='script');
-  document.getElementById('page-vocab').classList.toggle('hidden',name!=='vocab');
+  ['script','phrases','vocab'].forEach(p=>document.getElementById('page-'+p).classList.toggle('hidden',p!==name));
+  if(name==='phrases')loadAllPhrases();
 }
 
 // ── Gist ──
 async function gistLoad(){
-  const token=getGH(); if(!token)return null;
+  const token=getGH();if(!token)return null;
   try{
-    const res=await fetch(`https://api.github.com/gists/${GIST_ID}`,{
-      headers:{'Authorization':`token ${token}`,'Accept':'application/vnd.github.v3+json'}
-    });
+    const res=await fetch(`https://api.github.com/gists/${GIST_ID}`,{headers:{'Authorization':`token ${token}`,'Accept':'application/vnd.github.v3+json'}});
     if(!res.ok)return null;
     const data=await res.json();
     const content=data.files['pt_data.json']?.content;
@@ -603,9 +546,8 @@ async function gistLoad(){
     return JSON.parse(content);
   }catch(e){return null;}
 }
-
 async function gistSave(payload){
-  const token=getGH(); if(!token)throw new Error('GitHub tokenが設定されていません');
+  const token=getGH();if(!token)throw new Error('GitHub tokenが設定されていません');
   const res=await fetch(`https://api.github.com/gists/${GIST_ID}`,{
     method:'PATCH',
     headers:{'Authorization':`token ${token}`,'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'},
@@ -614,33 +556,22 @@ async function gistSave(payload){
   if(!res.ok)throw new Error('Gistへの保存に失敗しました');
 }
 
-// ── Check saved ──
+// ── Init load ──
 async function checkSavedData(){
-  const data=await gistLoad();
-  if(!data)return;
+  const data=await gistLoad();if(!data)return;
   if(data.current&&data.current.script){
     const w=countWords(data.current.script);
     const arcLen=(data.archives||[]).length;
-    document.getElementById('saved-script-info').textContent=
-      `保存済みスクリプトあり（${w} words · ${(data.current.phrases||[]).length} phrases · アーカイブ${arcLen}件）`;
+    document.getElementById('saved-script-info').textContent=`保存済みスクリプトあり（${w} words · ${(data.current.phrases||[]).length} phrases · アーカイブ${arcLen}件）`;
     document.getElementById('saved-banner').classList.remove('hidden');
   }
-  // 単語帳も読み込み
-  if(data.vocabulary&&data.vocabulary.length){
-    vocabList=data.vocabulary;
-    renderVocabList();
-    if(vocabList.length)showVocabCard(0);
-  }
+  if(data.vocabulary&&data.vocabulary.length){vocabList=data.vocabulary;renderVocabList();if(vocabList.length)showVocabCard(0);}
 }
-
 function loadSavedData(){
-  gistLoad().then(data=>{
-    if(!data||!data.current)return;
-    renderResult(data.current.script,data.current.phrases||[]);
-  });
+  gistLoad().then(data=>{if(!data||!data.current)return;renderResult(data.current.script,data.current.phrases||[]);});
 }
 
-// ── Archive modal ──
+// ── Archive ──
 async function openArchiveModal(){
   document.getElementById('archive-modal').classList.remove('hidden');
   const listEl=document.getElementById('archive-list');
@@ -649,33 +580,81 @@ async function openArchiveModal(){
   const archives=(data&&data.archives)||[];
   if(!archives.length){listEl.innerHTML='<div class="empty-msg">アーカイブはまだありません</div>';return;}
   listEl.innerHTML='';
-  // 新しい順
-  [...archives].reverse().forEach((a,i)=>{
-    const idx=archives.length-1-i;
-    const d=document.createElement('div');
-    d.className='archive-item';
+  [...archives].reverse().forEach((a)=>{
+    const d=document.createElement('div');d.className='archive-item';
     const date=a.savedAt?new Date(a.savedAt).toLocaleDateString('ja-JP',{year:'numeric',month:'long',day:'numeric'}):'';
-    const summary=a.summary||(a.script?a.script.split('.')[0].slice(0,80)+'…':'');
-    d.innerHTML=`<div class="archive-date">${date}</div>
-      <div class="archive-summary">${summary}</div>
-      <div class="archive-meta">${countWords(a.script||'')} words · ${(a.phrases||[]).length} phrases</div>`;
+    const summary=a.summary||(a.script?a.script.split(/[.!?]/)[0].slice(0,80)+'…':'');
+    d.innerHTML=`<div class="archive-date">${date}</div><div class="archive-summary">${summary}</div><div class="archive-meta">${countWords(a.script||'')} words · ${(a.phrases||[]).length} phrases</div>`;
     d.onclick=()=>{renderResult(a.script,a.phrases||[]);closeArchiveModal();};
     listEl.appendChild(d);
   });
 }
 function closeArchiveModal(){document.getElementById('archive-modal').classList.add('hidden');}
 
+// ── All Phrases (フレーズ帳) ──
+async function loadAllPhrases(){
+  const data=await gistLoad();if(!data)return;
+  allPhrases=[];
+  const addPhrases=(phraseList,label)=>{
+    (phraseList||[]).forEach(p=>allPhrases.push({...p,_source:label}));
+  };
+  if(data.current){
+    const label=data.current.savedAt?new Date(data.current.savedAt).toLocaleDateString('ja-JP',{month:'short',day:'numeric'})+'（最新）':'最新';
+    addPhrases(data.current.phrases,label);
+  }
+  if(data.archives){
+    [...data.archives].reverse().forEach(a=>{
+      const label=a.savedAt?new Date(a.savedAt).toLocaleDateString('ja-JP',{month:'short',day:'numeric'}):'アーカイブ';
+      addPhrases(a.phrases,label);
+    });
+  }
+  document.getElementById('allphrases-total').textContent=`${allPhrases.length} phrases`;
+  if(!allPhrases.length){
+    document.getElementById('allphrases-empty').classList.remove('hidden');
+    document.getElementById('allphrases-fc-area').classList.add('hidden');
+    document.getElementById('allphrases-list').innerHTML='';
+    return;
+  }
+  document.getElementById('allphrases-empty').classList.add('hidden');
+  document.getElementById('allphrases-fc-area').classList.remove('hidden');
+  apIndex=0;showAPCard(0);
+  const listEl=document.getElementById('allphrases-list');
+  listEl.innerHTML='';
+  allPhrases.forEach(p=>{
+    const d=document.createElement('div');d.className='phrase-item';
+    d.innerHTML=`<div><span class="phrase-pill">${p.phrase}</span><span class="phrase-source">${p._source}</span></div><div class="phrase-meaning">${p.meaning}</div><div class="phrase-example">"${p.example}"</div>`;
+    listEl.appendChild(d);
+  });
+}
+function switchAllPhrasesTab(name,btn){
+  document.querySelectorAll('#page-phrases .tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('allphrases-flashcard-view').classList.toggle('hidden',name!=='flashcard');
+  document.getElementById('allphrases-list-view').classList.toggle('hidden',name!=='list');
+}
+function flipAPCard(){apFlipped=!apFlipped;document.getElementById('ap-flashcard').classList.toggle('flipped',apFlipped);}
+function showAPCard(i){
+  if(!allPhrases.length)return;
+  apFlipped=false;document.getElementById('ap-flashcard').classList.remove('flipped');
+  const p=allPhrases[i];
+  document.getElementById('ap-fc-phrase').textContent=p.phrase;
+  document.getElementById('ap-fc-source').textContent=p._source;
+  document.getElementById('ap-fc-meaning').textContent=p.meaning;
+  document.getElementById('ap-fc-example').textContent='"'+p.example+'"';
+  document.getElementById('ap-fc-counter').textContent=`${i+1} / ${allPhrases.length}`;
+}
+function nextAPCard(){apIndex=(apIndex+1)%allPhrases.length;showAPCard(apIndex);}
+function prevAPCard(){apIndex=(apIndex-1+allPhrases.length)%allPhrases.length;showAPCard(apIndex);}
+
 // ── Extract & Save ──
 async function extractAndSave(){
   const script=document.getElementById('script-input').value.trim();
   if(!script){showExtractError('スクリプトを入力してください。');return;}
-  const ak=getAK(); if(!ak){openSettings();return;}
-  const gh=getGH(); if(!gh){openSettings();return;}
-
+  const ak=getAK();if(!ak){openSettings();return;}
+  const gh=getGH();if(!gh){openSettings();return;}
   const btn=document.getElementById('extract-btn');
-  btn.disabled=true; btn.textContent='⏳ 抽出中...';
+  btn.disabled=true;btn.textContent='⏳ 抽出中...';
   document.getElementById('extract-error').classList.add('hidden');
-
   const prompt=`You are an English presentation coach helping a Japanese academic learner.
 Analyze the following English presentation script and extract key phrases and sentence structures worth memorizing.
 Script:
@@ -685,12 +664,10 @@ ${script}
 Respond ONLY with a raw JSON array. No explanation, no markdown, no backticks. Start with [ and end with ].
 [{"phrase":"...","meaning":"日本語で：意味・使い方・どんな場面で使うかを2〜3文で説明","example":"..."}]
 Extract 6-8 phrases. Focus on discourse markers, academic expressions, and reusable presentation phrases. Meanings in Japanese.`;
-
   try{
     const res=await fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',
-      headers:{'Content-Type':'application/json','x-api-key':ak,
-        'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      headers:{'Content-Type':'application/json','x-api-key':ak,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
       body:JSON.stringify({model:'claude-haiku-4-5',max_tokens:1500,messages:[{role:'user',content:prompt}]})
     });
     const apiData=await res.json();
@@ -699,61 +676,50 @@ Extract 6-8 phrases. Focus on discourse markers, academic expressions, and reusa
     const match=raw.match(/\[[\s\S]*\]/);
     if(!match)throw new Error('フレーズの抽出に失敗しました');
     const extracted=JSON.parse(match[0]);
-
-    // 概要（冒頭1文）
     const summary=script.split(/[.!?]/)[0].trim().slice(0,100)+(script.length>100?'…':'');
-
-    // 既存データ読み込み → アーカイブ追加 → 保存
     const existing=await gistLoad()||{};
     const archives=existing.archives||[];
     if(existing.current&&existing.current.script){
-      // 既存スクリプトのsummaryがなければ、既存スクリプトから生成
-      const existingSummary = existing.current.summary
-        || (existing.current.script.split(/[.!?]/)[0].trim().slice(0,100)
-            + (existing.current.script.length>100?'…':''));
-      archives.push({...existing.current, summary: existingSummary});
-      // アーカイブは最大20件
+      const existingSummary=existing.current.summary||(existing.current.script.split(/[.!?]/)[0].trim().slice(0,100)+(existing.current.script.length>100?'…':''));
+      archives.push({...existing.current,summary:existingSummary});
       if(archives.length>20)archives.shift();
     }
-    const newData={
-      current:{script,phrases:extracted,savedAt:new Date().toISOString(),summary},
-      archives,
-      vocabulary:existing.vocabulary||[]
-    };
+    const newData={current:{script,phrases:extracted,savedAt:new Date().toISOString(),summary},archives,vocabulary:existing.vocabulary||[]};
     await gistSave(newData);
     renderResult(script,extracted);
   }catch(e){showExtractError(`エラー：${e.message}`);}
-
-  btn.disabled=false; btn.textContent='✨ 抽出して保存';
+  btn.disabled=false;btn.textContent='✨ 抽出して保存';
 }
+function showExtractError(msg){const el=document.getElementById('extract-error');el.textContent=msg;el.classList.remove('hidden');}
 
-function showExtractError(msg){
-  const el=document.getElementById('extract-error');
-  el.textContent=msg; el.classList.remove('hidden');
+// ── Pron cache key ──
+function getPronCacheKey(script){
+  const hash=btoa(encodeURIComponent(script.slice(0,200))).replace(/[^a-zA-Z0-9]/g,'').slice(0,40);
+  return`pt_pron_${hash}`;
 }
 
 // ── Script mode toggle ──
-function switchScriptMode(mode) {
-  document.getElementById('mode-btn-normal').classList.toggle('active', mode === 'normal');
-  document.getElementById('mode-btn-pron').classList.toggle('active', mode === 'pron');
-  document.getElementById('script-normal').classList.toggle('hidden', mode !== 'normal');
-  document.getElementById('script-pron').classList.toggle('hidden', mode !== 'pron');
-
-  if (mode === 'pron') {
-    if (pronCacheHtml) {
-      document.getElementById('pron-display').innerHTML = pronCacheHtml;
-    } else {
-      generatePronGuide(currentScript);
-    }
+function switchScriptMode(mode){
+  document.getElementById('mode-btn-normal').classList.toggle('active',mode==='normal');
+  document.getElementById('mode-btn-pron').classList.toggle('active',mode==='pron');
+  document.getElementById('script-normal').classList.toggle('hidden',mode!=='normal');
+  document.getElementById('script-pron').classList.toggle('hidden',mode!=='pron');
+  if(mode==='pron'){
+    if(pronCacheHtml){document.getElementById('pron-display').innerHTML=pronCacheHtml;}
+    else{generatePronGuide(currentScript);}
   }
 }
 
-async function generatePronGuide(script) {
-  const ak = getAK(); if (!ak) { openSettings(); return; }
-  document.getElementById('pron-loading').classList.remove('hidden');
-  document.getElementById('pron-display').innerHTML = '';
+async function generatePronGuide(script){
+  const ak=getAK();if(!ak){openSettings();return;}
+  // Check localStorage cache first
+  const cacheKey=getPronCacheKey(script);
+  const cached=localStorage.getItem(cacheKey);
+  if(cached){pronCacheHtml=cached;document.getElementById('pron-display').innerHTML=cached;return;}
 
-  const prompt = `You are an English pronunciation coach. Analyze the following script and return pronunciation markup.
+  document.getElementById('pron-loading').classList.remove('hidden');
+  document.getElementById('pron-display').innerHTML='';
+  const prompt=`You are an English pronunciation coach. Analyze the following script and return pronunciation markup.
 
 For each token (word or punctuation), output one line in this exact pipe-separated format:
 TOKEN|TYPE|SYLLABLES|STRESSED_SYLLABLE
@@ -787,92 +753,64 @@ Script:
 """
 ${script}
 """`;
-
-  try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': ak,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
-      },
-      body: JSON.stringify({
-        model: 'claude-haiku-4-5',
-        max_tokens: 8000,
-        messages: [{ role: 'user', content: prompt }]
-      })
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':ak,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-haiku-4-5',max_tokens:8000,messages:[{role:'user',content:prompt}]})
     });
-
-    const apiData = await res.json();
-    if (apiData.type === 'error') throw new Error(apiData.error?.message);
-    const raw = (apiData.content || []).map(b => b.text || '').join('').trim();
-
-    const lines = raw.split('\n').map(l => l.trim()).filter(l => l.includes('|'));
-    if (!lines.length) throw new Error('レスポンスの解析に失敗しました: ' + raw.slice(0, 100));
-
-    let html = '';
-    lines.forEach(line => {
-      const parts = line.split('|');
-      if (parts.length < 4) return;
-      const word = parts[0].trim();
-      const type = parts[1].trim();
-      const syllablesStr = parts[2].trim();
-      const stressedSyl = parts[3].trim().toLowerCase();
-      const wordSafe = word.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-
-      if (type === 'punct') {
-        html += `<span>${wordSafe}</span>`;
-        if (/^[.!?]$/.test(word)) html += '<br><br>';
-      } else if (type === 'function') {
-        html += `<span class="w-function">${wordSafe}</span> `;
-      } else {
-        const syllables = syllablesStr ? syllablesStr.split('-') : [];
+    const apiData=await res.json();
+    if(apiData.type==='error')throw new Error(apiData.error?.message);
+    const raw=(apiData.content||[]).map(b=>b.text||'').join('').trim();
+    const lines=raw.split('\n').map(l=>l.trim()).filter(l=>l.includes('|'));
+    if(!lines.length)throw new Error('レスポンスの解析に失敗しました: '+raw.slice(0,100));
+    let html='';
+    lines.forEach(line=>{
+      const parts=line.split('|');if(parts.length<4)return;
+      const word=parts[0].trim(),type=parts[1].trim(),syllablesStr=parts[2].trim(),stressedSyl=parts[3].trim().toLowerCase();
+      const wordSafe=word.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      if(type==='punct'){html+=`<span>${wordSafe}</span>`;if(/^[.!?]$/.test(word))html+='<br><br>';}
+      else if(type==='function'){html+=`<span class="w-function">${wordSafe}</span> `;}
+      else{
+        const syllables=syllablesStr?syllablesStr.split('-'):[];
         let display;
-        if (syllables.length > 1 && stressedSyl && stressedSyl !== '-') {
-          display = syllables.map(syl =>
-            syl.toLowerCase() === stressedSyl
-              ? `<span class="stressed">${syl}</span>`
-              : syl
-          ).join('\u00B7');
-        } else {
-          display = wordSafe;
-        }
-        html += `<span class="w-content">${display}</span> `;
+        if(syllables.length>1&&stressedSyl&&stressedSyl!=='-'){
+          display=syllables.map(syl=>syl.toLowerCase()===stressedSyl?`<span class="stressed">${syl}</span>`:syl).join('\u00B7');
+        }else{display=wordSafe;}
+        html+=`<span class="w-content">${display}</span> `;
       }
     });
-
-    pronCacheHtml = html;
-    document.getElementById('pron-display').innerHTML = html;
-
-  } catch(e) {
-    document.getElementById('pron-display').textContent = `エラー：${e.message}`;
-  }
+    pronCacheHtml=html;
+    // Save to localStorage
+    try{localStorage.setItem(cacheKey,html);localStorage.setItem(cacheKey+'_ts',Date.now().toString());}catch(e){}
+    document.getElementById('pron-display').innerHTML=html;
+  }catch(e){document.getElementById('pron-display').textContent=`エラー：${e.message}`;}
   document.getElementById('pron-loading').classList.add('hidden');
 }
-function renderResult(script,extractedPhrases){
-  phrases=extractedPhrases;
-  currentScript=script;
-  pronCacheHtml=''; // 新スクリプトのたびにリセット
 
-  // モードを通常に戻す
+// ── Render result ──
+function renderResult(script,extractedPhrases){
+  phrases=extractedPhrases;currentScript=script;
+  // Check pron cache from localStorage
+  const cacheKey=getPronCacheKey(script);
+  const cached=localStorage.getItem(cacheKey);
+  pronCacheHtml=cached||'';
+
   document.getElementById('mode-btn-normal').classList.add('active');
   document.getElementById('mode-btn-pron').classList.remove('active');
   document.getElementById('script-normal').classList.remove('hidden');
   document.getElementById('script-pron').classList.add('hidden');
   document.getElementById('pron-display').innerHTML='';
-
   document.getElementById('view-input').classList.add('hidden');
   document.getElementById('view-result').classList.remove('hidden');
   document.getElementById('script-display').innerHTML=highlightScript(script,extractedPhrases);
   const words=countWords(script);
   document.getElementById('word-count').textContent=`${words} words · ~${(words/130).toFixed(1)} min`;
   document.getElementById('phrase-total').textContent=`${phrases.length} phrases`;
-  cardIndex=0; showCard(0);
-  const listEl=document.getElementById('phrase-list');
-  listEl.innerHTML='';
+  cardIndex=0;showCard(0);
+  const listEl=document.getElementById('phrase-list');listEl.innerHTML='';
   phrases.forEach(p=>{
-    const d=document.createElement('div'); d.className='phrase-item';
+    const d=document.createElement('div');d.className='phrase-item';
     d.innerHTML=`<div class="phrase-pill">${p.phrase}</div><div class="phrase-meaning">${p.meaning}</div><div class="phrase-example">"${p.example}"</div>`;
     listEl.appendChild(d);
   });
@@ -880,7 +818,7 @@ function renderResult(script,extractedPhrases){
 }
 
 function showInputView(){
-  speechSynthesis.cancel(); stopProgress();
+  stopTTS();
   document.getElementById('view-result').classList.add('hidden');
   document.getElementById('view-input').classList.remove('hidden');
 }
@@ -893,11 +831,9 @@ function highlightScript(script,extractedPhrases){
     const esc=p.phrase.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
     escaped=escaped.replace(new RegExp(`(${esc})`,'gi'),`<mark data-idx="${idx}" onclick="jumpToCard(${idx})" title="${p.phrase}">$1</mark>`);
   });
-  // 段落間の空行を<br><br>に、単純な改行を<br>に変換
   escaped=escaped.replace(/\n\n+/g,'<br><br>').replace(/\n/g,'<br>');
   return escaped;
 }
-
 function jumpToCard(idx){
   cardIndex=idx;
   const fcView=document.getElementById('flashcard-view');
@@ -911,7 +847,7 @@ function jumpToCard(idx){
   document.getElementById('flashcard').scrollIntoView({behavior:'smooth',block:'center'});
 }
 
-// ── Flashcard (phrases) ──
+// ── Flashcard (script phrases) ──
 function switchTab(name,btn){
   document.querySelectorAll('#page-script .tab').forEach(t=>t.classList.remove('active'));
   btn.classList.add('active');
@@ -921,7 +857,7 @@ function switchTab(name,btn){
 function flipCard(){isFlipped=!isFlipped;document.getElementById('flashcard').classList.toggle('flipped',isFlipped);}
 function showCard(i){
   if(!phrases.length)return;
-  isFlipped=false; document.getElementById('flashcard').classList.remove('flipped');
+  isFlipped=false;document.getElementById('flashcard').classList.remove('flipped');
   const p=phrases[i];
   document.getElementById('fc-phrase').textContent=p.phrase;
   document.getElementById('fc-meaning').textContent=p.meaning;
@@ -944,23 +880,19 @@ document.getElementById('script-input').addEventListener('input',()=>{
 // ── Vocab ──
 async function addVocab(){
   const input=document.getElementById('vocab-word-input');
-  const word=input.value.trim(); if(!word)return;
-  const ak=getAK(); if(!ak){openSettings();return;}
-
+  const word=input.value.trim();if(!word)return;
+  const ak=getAK();if(!ak){openSettings();return;}
   const btn=document.getElementById('vocab-add-btn');
-  btn.disabled=true; btn.textContent='調べ中...';
+  btn.disabled=true;btn.textContent='調べ中...';
   document.getElementById('vocab-error').classList.add('hidden');
-
   const prompt=`You are an English vocabulary tutor for a Japanese medical researcher.
 Look up the following English word/phrase and provide a JSON object (no markdown, no backticks):
 {"word":"${word}","pronunciation":"/IPA symbols here/","meaning":"日本語で：意味と医学・学術での使い方を2〜3文で説明","example":"A natural English example sentence using this word in an academic or medical context"}
 Include IPA pronunciation symbols in the pronunciation field (e.g. /brɒŋkiˈɛktəsɪs/).`;
-
   try{
     const res=await fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',
-      headers:{'Content-Type':'application/json','x-api-key':ak,
-        'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      headers:{'Content-Type':'application/json','x-api-key':ak,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
       body:JSON.stringify({model:'claude-haiku-4-5',max_tokens:400,messages:[{role:'user',content:prompt}]})
     });
     const apiData=await res.json();
@@ -969,85 +901,47 @@ Include IPA pronunciation symbols in the pronunciation field (e.g. /brɒŋkiˈɛ
     const match=raw.match(/\{[\s\S]*\}/);
     if(!match)throw new Error('解析に失敗しました');
     const entry={...JSON.parse(match[0]),addedAt:new Date().toISOString()};
-
-    // 重複チェック
-    if(vocabList.find(v=>v.word.toLowerCase()===entry.word.toLowerCase())){
-      throw new Error('すでに登録されています');
-    }
+    if(vocabList.find(v=>v.word.toLowerCase()===entry.word.toLowerCase()))throw new Error('すでに登録されています');
     vocabList.push(entry);
-
-    // Gistに保存
-    const data=await gistLoad()||{};
-    data.vocabulary=vocabList;
-    await gistSave(data);
-
-    input.value='';
-    renderVocabList();
-    showVocabCard(vocabList.length-1);
-  }catch(e){
-    const el=document.getElementById('vocab-error');
-    el.textContent=`エラー：${e.message}`; el.classList.remove('hidden');
-  }
-  btn.disabled=false; btn.textContent='追加';
+    const data=await gistLoad()||{};data.vocabulary=vocabList;await gistSave(data);
+    input.value='';renderVocabList();showVocabCard(vocabList.length-1);
+  }catch(e){const el=document.getElementById('vocab-error');el.textContent=`エラー：${e.message}`;el.classList.remove('hidden');}
+  btn.disabled=false;btn.textContent='追加';
 }
-
 function renderVocabList(){
   const total=vocabList.length;
   document.getElementById('vocab-total').textContent=`${total} words`;
-  const listEl=document.getElementById('vocab-list');
-  listEl.innerHTML='';
-  if(!total){
-    document.getElementById('vocab-empty').classList.remove('hidden');
-    document.getElementById('vocab-fc-area').classList.add('hidden');
-    return;
-  }
-  document.getElementById('vocab-empty').classList.add('hidden');
-  document.getElementById('vocab-fc-area').classList.remove('hidden');
-
+  const listEl=document.getElementById('vocab-list');listEl.innerHTML='';
+  if(!total){document.getElementById('vocab-empty').classList.remove('hidden');document.getElementById('vocab-fc-area').classList.add('hidden');return;}
+  document.getElementById('vocab-empty').classList.add('hidden');document.getElementById('vocab-fc-area').classList.remove('hidden');
   [...vocabList].reverse().forEach((v,ri)=>{
     const i=vocabList.length-1-ri;
     const youglishUrl=`https://youglish.com/pronounce/${encodeURIComponent(v.word)}/english`;
-    const d=document.createElement('div'); d.className='vocab-item';
-    d.innerHTML=`<div style="flex:1;">
-      <div class="vocab-word">${v.word}</div>
-      ${v.pronunciation?`<div class="vocab-pron">${v.pronunciation}</div>`:''}
-      <div class="vocab-meaning">${v.meaning}</div>
-      <div class="vocab-example">"${v.example}"</div>
-      <a class="vocab-youglish" href="${youglishUrl}" target="_blank" rel="noopener">🔊 YouGlish で発音を確認</a>
-    </div>
-    <button class="btn btn-danger-sm" onclick="deleteVocab(${i})" style="flex-shrink:0;">削除</button>`;
+    const d=document.createElement('div');d.className='vocab-item';
+    d.innerHTML=`<div style="flex:1;"><div class="vocab-word">${v.word}</div>${v.pronunciation?`<div class="vocab-pron">${v.pronunciation}</div>`:''}<div class="vocab-meaning">${v.meaning}</div><div class="vocab-example">"${v.example}"</div><a class="vocab-youglish" href="${youglishUrl}" target="_blank" rel="noopener">🔊 YouGlish で発音を確認</a></div><button class="btn btn-danger-sm" onclick="deleteVocab(${i})" style="flex-shrink:0;">削除</button>`;
     listEl.appendChild(d);
   });
 }
-
 async function deleteVocab(i){
   vocabList.splice(i,1);
-  const data=await gistLoad()||{};
-  data.vocabulary=vocabList;
-  await gistSave(data);
+  const data=await gistLoad()||{};data.vocabulary=vocabList;await gistSave(data);
   renderVocabList();
-  if(vocabList.length){
-    vocabIndex=Math.min(vocabIndex,vocabList.length-1);
-    showVocabCard(vocabIndex);
-  }
+  if(vocabList.length){vocabIndex=Math.min(vocabIndex,vocabList.length-1);showVocabCard(vocabIndex);}
 }
-
 function switchVocabTab(name,btn){
   document.querySelectorAll('#page-vocab .tab').forEach(t=>t.classList.remove('active'));
   btn.classList.add('active');
   document.getElementById('vocab-flashcard-view').classList.toggle('hidden',name!=='flashcard');
   document.getElementById('vocab-list-view').classList.toggle('hidden',name!=='list');
 }
-
 function flipVocabCard(){vocabFlipped=!vocabFlipped;document.getElementById('vocab-flashcard').classList.toggle('flipped',vocabFlipped);}
 function showVocabCard(i){
   if(!vocabList.length)return;
-  vocabFlipped=false; document.getElementById('vocab-flashcard').classList.remove('flipped');
+  vocabFlipped=false;document.getElementById('vocab-flashcard').classList.remove('flipped');
   const v=vocabList[i];
   document.getElementById('vfc-word').textContent=v.word;
   document.getElementById('vfc-pron').textContent=v.pronunciation||'';
-  const youglishUrl=`https://youglish.com/pronounce/${encodeURIComponent(v.word)}/english`;
-  document.getElementById('vfc-youglish').href=youglishUrl;
+  document.getElementById('vfc-youglish').href=`https://youglish.com/pronounce/${encodeURIComponent(v.word)}/english`;
   document.getElementById('vfc-meaning').textContent=v.meaning;
   document.getElementById('vfc-example').textContent='"'+v.example+'"';
   document.getElementById('vfc-counter').textContent=`${i+1} / ${vocabList.length}`;
@@ -1080,15 +974,13 @@ function populateVoices(){
   if(!voices.length)return;
   voices.sort((a,b)=>voiceScore(b)-voiceScore(a));
   availableVoices=voices;
-  const sel=document.getElementById('voice-select');
-  sel.innerHTML='';
+  const sel=document.getElementById('voice-select');sel.innerHTML='';
   voices.forEach((v,i)=>{
-    const opt=document.createElement('option'); opt.value=i;
+    const opt=document.createElement('option');opt.value=i;
     let label=v.name;
     if(v.name.toLowerCase().includes('enhanced'))label+=' ★';
     else if(v.name.toLowerCase().includes('google'))label+=' ◆';
-    opt.textContent=`${label} (${v.lang})`;
-    sel.appendChild(opt);
+    opt.textContent=`${label} (${v.lang})`;sel.appendChild(opt);
   });
   selectedVoice=voices[0];
   const tag=document.getElementById('voice-quality-tag');
@@ -1096,27 +988,29 @@ function populateVoices(){
   if(n.includes('enhanced')){tag.textContent='高品質';tag.classList.remove('hidden');}
   else if(n.includes('google')){tag.textContent='Google';tag.classList.remove('hidden');}
 }
-function onVoiceChange(){
-  selectedVoice=availableVoices[parseInt(document.getElementById('voice-select').value)];
-}
+function onVoiceChange(){selectedVoice=availableVoices[parseInt(document.getElementById('voice-select').value)];}
 if(speechSynthesis.onvoiceschanged!==undefined)speechSynthesis.onvoiceschanged=populateVoices;
 setTimeout(populateVoices,200);
 
+function stopTTS(){
+  if(currentAudio){try{currentAudio.pause();currentAudio.src='';}catch(e){}currentAudio=null;}
+  speechSynthesis.cancel();
+  stopProgress();
+}
+
 async function toggleTTS(){
-  if(isSpeaking){
-    if(currentAudio){currentAudio.pause();currentAudio=null;}
-    speechSynthesis.cancel(); stopProgress(); return;
-  }
+  if(isSpeaking){stopTTS();return;}
   const el=document.getElementById('script-display');
-  const text=el.innerText||el.textContent; if(!text)return;
+  const text=el.innerText||el.textContent;if(!text)return;
   const engine=document.getElementById('tts-engine-select').value;
   const speed=parseFloat(document.getElementById('speed-select').value);
-  lastPlayText=text; lastPlaySpeed=speed;
-  if(engine==='openai'){const ok=getOK();if(!ok){openSettings();return;}await playOpenAITTS(text,ok,speed);}
+  const voice=document.getElementById('openai-voice-select').value;
+  lastPlayText=text;lastPlaySpeed=speed;lastPlayVoice=voice;
+  if(engine==='openai'){const ok=getOK();if(!ok){openSettings();return;}await playOpenAITTS(text,ok,speed,voice);}
   else{playBrowserTTS(text,speed);}
 }
 
-// Audio cache
+// ── Audio cache ──
 function getAudioCacheKey(text,voice,speed){
   const hash=btoa(encodeURIComponent(text.slice(0,80)+voice+speed)).replace(/[^a-zA-Z0-9]/g,'').slice(0,40);
   return`pt_audio_${hash}`;
@@ -1132,20 +1026,18 @@ function clearOldAudioCache(){
   keys.slice(0,Math.ceil(keys.length/2)).forEach(k=>{localStorage.removeItem(k);localStorage.removeItem(k+'_ts');});
 }
 
-async function playOpenAITTS(text,apiKey,speed){
-  const voice=document.getElementById('openai-voice-select').value;
+// ── <audio>ベースのTTS（iOS対応・繰り返し安定版）──
+async function playOpenAITTS(text,apiKey,speed,voice){
   const cacheKey=getAudioCacheKey(text,voice,speed);
   const cached=loadAudioCache(cacheKey);
-  isSpeaking=true;
   if(cached){
-    document.getElementById('play-icon').textContent='⏸';
-    document.getElementById('play-label').textContent='Pause';
-    await playBase64Audio(cached); return;
+    setPlayUI('⏸','Pause');
+    isSpeaking=true;
+    playAudioFromBase64(cached);
+    return;
   }
-  document.getElementById('play-icon').textContent='⏳';
-  document.getElementById('play-label').textContent='生成中...';
-  let audioCtx=null;
-  try{audioCtx=new(window.AudioContext||window.webkitAudioContext)();await audioCtx.resume();}catch(e){}
+  setPlayUI('⏳','生成中...');
+  isSpeaking=true;
   try{
     const res=await fetch('https://api.openai.com/v1/audio/speech',{
       method:'POST',
@@ -1154,66 +1046,50 @@ async function playOpenAITTS(text,apiKey,speed){
     });
     if(!res.ok){const err=await res.json();throw new Error(err.error?.message||'TTS error');}
     const ab=await res.arrayBuffer();
-    const b64=arrayBufferToBase64(ab); saveAudioCache(cacheKey,b64);
-    document.getElementById('play-icon').textContent='⏸';
-    document.getElementById('play-label').textContent='Pause';
-    if(audioCtx)await playWithAudioContext(audioCtx,ab);
-    else await playBase64Audio(b64);
-  }catch(e){stopProgress();alert(`音声生成エラー：${e.message}`);}
+    const b64=arrayBufferToBase64(ab);
+    saveAudioCache(cacheKey,b64);
+    setPlayUI('⏸','Pause');
+    playAudioFromBase64(b64);
+  }catch(e){stopProgress();isSpeaking=false;alert(`音声生成エラー：${e.message}`);}
+}
+
+function playAudioFromBase64(b64){
+  const bin=atob(b64);const bytes=new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);
+  const blob=new Blob([bytes],{type:'audio/mpeg'});
+  const url=URL.createObjectURL(blob);
+  const audio=new Audio(url);
+  audio.playbackRate=1.0;// speed already baked in via API
+  currentAudio=audio;
+  audio.addEventListener('loadedmetadata',()=>{
+    const dur=audio.duration;
+    progressInterval=setInterval(()=>{
+      if(!currentAudio||audio.paused)return;
+      document.getElementById('progress-bar').style.width=Math.min((audio.currentTime/dur)*100,100)+'%';
+    },200);
+  });
+  audio.addEventListener('ended',()=>{
+    URL.revokeObjectURL(url);
+    currentAudio=null;
+    stopProgress(true);
+  });
+  audio.addEventListener('error',()=>stopProgress());
+  audio.play().catch(e=>{stopProgress();alert(`再生エラー：${e.message}`);});
 }
 
 function arrayBufferToBase64(buffer){
-  let bin=''; const bytes=new Uint8Array(buffer);
+  let bin='';const bytes=new Uint8Array(buffer);
   for(let i=0;i<bytes.byteLength;i++)bin+=String.fromCharCode(bytes[i]);
   return btoa(bin);
 }
-function base64ToArrayBuffer(b64){
-  const bin=atob(b64); const bytes=new Uint8Array(bin.length);
-  for(let i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);
-  return bytes.buffer;
-}
-async function playBase64Audio(b64){
-  try{
-    const ctx=new(window.AudioContext||window.webkitAudioContext)();
-    await ctx.resume(); await playWithAudioContext(ctx,base64ToArrayBuffer(b64));
-  }catch(e){
-    const bin=atob(b64); const bytes=new Uint8Array(bin.length);
-    for(let i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);
-    const url=URL.createObjectURL(new Blob([bytes],{type:'audio/mpeg'}));
-    currentAudio=new Audio(url);
-    currentAudio.onended=()=>{stopProgress(true);URL.revokeObjectURL(url);};
-    currentAudio.onerror=()=>stopProgress();
-    currentAudio.onloadedmetadata=()=>{
-      const dur=currentAudio.duration;
-      progressInterval=setInterval(()=>{
-        if(!currentAudio)return;
-        document.getElementById('progress-bar').style.width=Math.min((currentAudio.currentTime/dur)*100,100)+'%';
-      },200);
-    };
-    await currentAudio.play();
-  }
-}
-async function playWithAudioContext(ctx,ab){
-  const decoded=await ctx.decodeAudioData(ab);
-  const src=ctx.createBufferSource(); src.buffer=decoded; src.connect(ctx.destination);
-  const dur=decoded.duration, t0=ctx.currentTime;
-  progressInterval=setInterval(()=>{
-    const el=ctx.currentTime-t0;
-    document.getElementById('progress-bar').style.width=Math.min((el/dur)*100,100)+'%';
-    if(el>=dur)stopProgress(true);
-  },200);
-  currentAudio={pause:()=>{try{src.stop();ctx.close();}catch(e){}}};
-  src.onended=()=>stopProgress(true); src.start(0);
-}
+
 function playBrowserTTS(text,speed){
   utterance=new SpeechSynthesisUtterance(text);
-  utterance.lang='en-US'; utterance.rate=speed;
+  utterance.lang='en-US';utterance.rate=speed;
   if(selectedVoice)utterance.voice=selectedVoice;
   const tc=text.length;
   utterance.onstart=()=>{
-    isSpeaking=true;
-    document.getElementById('play-icon').textContent='⏸';
-    document.getElementById('play-label').textContent='Pause';
+    isSpeaking=true;setPlayUI('⏸','Pause');
     let prog=0;
     progressInterval=setInterval(()=>{
       prog=Math.min(prog+tc/(speed*120),tc);
@@ -1223,15 +1099,19 @@ function playBrowserTTS(text,speed){
   utterance.onend=utterance.onerror=()=>stopProgress(true);
   speechSynthesis.speak(utterance);
 }
+
+function setPlayUI(icon,label){
+  document.getElementById('play-icon').textContent=icon;
+  document.getElementById('play-label').textContent=label;
+}
 function stopProgress(fromEnded=false){
-  isSpeaking=false; clearInterval(progressInterval);
-  document.getElementById('play-icon').textContent='▶';
-  document.getElementById('play-label').textContent='Play';
+  isSpeaking=false;clearInterval(progressInterval);
+  setPlayUI('▶','Play');
   document.getElementById('progress-bar').style.width='0%';
   if(fromEnded&&isRepeat){
     setTimeout(()=>{
-      const e=document.getElementById('tts-engine-select').value;
-      if(e==='openai'){const ok=getOK();if(ok&&lastPlayText)playOpenAITTS(lastPlayText,ok,lastPlaySpeed);}
+      const engine=document.getElementById('tts-engine-select').value;
+      if(engine==='openai'){const ok=getOK();if(ok&&lastPlayText)playOpenAITTS(lastPlayText,ok,lastPlaySpeed,lastPlayVoice);}
       else if(lastPlayText)playBrowserTTS(lastPlayText,lastPlaySpeed);
     },800);
   }
