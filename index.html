@@ -230,7 +230,7 @@
 <div class="header">
   <div class="week-badge">📅 <span id="week-label"></span></div>
   <h1>Weekly Presentation Trainer</h1>
-  <p>スクリプト · リスニング · フレーズ · 単語帳 <span style="font-size:11px;color:var(--text-3);margin-left:6px;">v1.8.0</span></p>
+  <p>スクリプト · リスニング · フレーズ · 単語帳 <span style="font-size:11px;color:var(--text-3);margin-left:6px;">v1.8.1</span></p>
 </div>
 
 <!-- Settings bar -->
@@ -487,7 +487,7 @@ const GIST_ID='3e51837baf84554a02befb4235600ca6';
 let phrases=[],cardIndex=0,isFlipped=false;
 let allPhrases=[],apIndex=0,apFlipped=false;
 let vocabList=[],vocabIndex=0,vocabFlipped=false;
-let isSpeaking=false,progressInterval=null;
+let isSpeaking=false,progressInterval=null,repeatTimer=null;
 let utterance=null,availableVoices=[],selectedVoice=null;
 let isRepeat=false,lastPlayText='',lastPlaySpeed=1.0,lastPlayVoice='echo';
 let currentAudio=null;
@@ -711,6 +711,7 @@ function switchScriptMode(mode){
 }
 
 async function generatePronGuide(script){
+  if(!script||!script.trim()){document.getElementById('pron-display').textContent='スクリプトが読み込まれていません。';return;}
   const ak=getAK();if(!ak){openSettings();return;}
   // Check localStorage cache first
   const cacheKey=getPronCacheKey(script);
@@ -993,6 +994,7 @@ if(speechSynthesis.onvoiceschanged!==undefined)speechSynthesis.onvoiceschanged=p
 setTimeout(populateVoices,200);
 
 function stopTTS(){
+  if(repeatTimer){clearTimeout(repeatTimer);repeatTimer=null;}
   if(currentAudio){try{currentAudio.pause();currentAudio.src='';}catch(e){}currentAudio=null;}
   speechSynthesis.cancel();
   stopProgress();
@@ -1054,12 +1056,13 @@ async function playOpenAITTS(text,apiKey,speed,voice){
 }
 
 function playAudioFromBase64(b64){
+  clearInterval(progressInterval);// 前のintervalを確実にクリア
   const bin=atob(b64);const bytes=new Uint8Array(bin.length);
   for(let i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);
   const blob=new Blob([bytes],{type:'audio/mpeg'});
   const url=URL.createObjectURL(blob);
   const audio=new Audio(url);
-  audio.playbackRate=1.0;// speed already baked in via API
+  audio.playbackRate=1.0;
   currentAudio=audio;
   audio.addEventListener('loadedmetadata',()=>{
     const dur=audio.duration;
@@ -1109,7 +1112,10 @@ function stopProgress(fromEnded=false){
   setPlayUI('▶','Play');
   document.getElementById('progress-bar').style.width='0%';
   if(fromEnded&&isRepeat){
-    setTimeout(()=>{
+    if(repeatTimer)clearTimeout(repeatTimer);
+    repeatTimer=setTimeout(()=>{
+      repeatTimer=null;
+      if(isSpeaking)return;// すでに別の再生が始まっていればスキップ
       const engine=document.getElementById('tts-engine-select').value;
       if(engine==='openai'){const ok=getOK();if(ok&&lastPlayText)playOpenAITTS(lastPlayText,ok,lastPlaySpeed,lastPlayVoice);}
       else if(lastPlayText)playBrowserTTS(lastPlayText,lastPlaySpeed);
