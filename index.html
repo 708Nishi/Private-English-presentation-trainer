@@ -171,6 +171,17 @@
   .empty-msg{text-align:center;padding:2rem 1rem;font-size:13px;color:var(--text-3);}
   .hidden{display:none;}
 
+  /* ── Today's review ── */
+  .today-card{background:linear-gradient(135deg,var(--purple-light),#F5F3FE);border:1.5px solid var(--purple-border);border-radius:var(--radius);padding:1.1rem 1.25rem;margin-bottom:1.5rem;cursor:pointer;transition:all 0.15s;}
+  .today-card:hover{border-color:var(--purple);}
+  .today-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+  .today-label{font-size:11px;font-weight:600;letter-spacing:0.06em;color:var(--purple-dark);display:flex;align-items:center;gap:5px;}
+  .today-type{font-size:10px;font-weight:500;color:var(--purple-deeper);background:rgba(255,255,255,0.7);border:1px solid var(--purple-border);border-radius:20px;padding:2px 8px;}
+  .today-main{font-size:16px;font-weight:600;color:var(--purple-deeper);line-height:1.4;margin-bottom:6px;}
+  .today-sub{font-size:13px;color:var(--text-2);line-height:1.6;}
+  .today-example{font-size:12px;color:var(--text-3);font-style:italic;margin-top:5px;}
+  .today-hint{font-size:10px;color:var(--purple-border);margin-top:8px;}
+
   @media(max-width:560px){
     .page{padding:1.25rem 1rem 3rem;}
     .header h1{font-size:18px;}
@@ -230,7 +241,7 @@
 <div class="header">
   <div class="week-badge">📅 <span id="week-label"></span></div>
   <h1>Weekly Presentation Trainer</h1>
-  <p>スクリプト · リスニング · フレーズ · 単語帳 <span style="font-size:11px;color:var(--text-3);margin-left:6px;">v1.8.1</span></p>
+  <p>スクリプト · リスニング · フレーズ · 単語帳 <span style="font-size:11px;color:var(--text-3);margin-left:6px;">v1.9.0</span></p>
 </div>
 
 <!-- Settings bar -->
@@ -246,6 +257,20 @@
   <button class="nav-tab active" onclick="switchPage('script',this)">📄 スクリプト</button>
   <button class="nav-tab" onclick="switchPage('phrases',this)">🃏 フレーズ帳</button>
   <button class="nav-tab" onclick="switchPage('vocab',this)">📚 単語帳</button>
+</div>
+
+<!-- Today's review -->
+<div id="today-card" class="today-card hidden" onclick="flipTodayCard()">
+  <div class="today-head">
+    <div class="today-label">☀️ 今日の復習</div>
+    <span class="today-type" id="today-type">—</span>
+  </div>
+  <div class="today-main" id="today-main">—</div>
+  <div id="today-back" class="hidden">
+    <div class="today-sub" id="today-sub">—</div>
+    <div class="today-example" id="today-example"></div>
+  </div>
+  <div class="today-hint" id="today-hint">タップして意味を表示</div>
 </div>
 
 <!-- ====== PAGE: SCRIPT ====== -->
@@ -566,6 +591,46 @@ async function checkSavedData(){
     document.getElementById('saved-banner').classList.remove('hidden');
   }
   if(data.vocabulary&&data.vocabulary.length){vocabList=data.vocabulary;renderVocabList();if(vocabList.length)showVocabCard(0);}
+  setupTodayReview(data);
+}
+
+// ── Today's review ──
+let todayFlipped=false;
+function setupTodayReview(data){
+  // フレーズと単語を1つのプールに集める
+  const pool=[];
+  if(data.current&&data.current.phrases){
+    data.current.phrases.forEach(p=>pool.push({type:'phrase',main:p.phrase,sub:p.meaning,example:p.example}));
+  }
+  if(data.archives){
+    data.archives.forEach(a=>(a.phrases||[]).forEach(p=>pool.push({type:'phrase',main:p.phrase,sub:p.meaning,example:p.example})));
+  }
+  if(data.vocabulary){
+    data.vocabulary.forEach(v=>pool.push({type:'word',main:v.word,sub:v.meaning,example:v.example,pron:v.pronunciation}));
+  }
+  if(!pool.length)return;
+
+  // 日付をシードにして固定ランダム選択
+  const today=new Date();
+  const seed=today.getFullYear()*10000+(today.getMonth()+1)*100+today.getDate();
+  const idx=seed%pool.length;
+  const item=pool[idx];
+
+  document.getElementById('today-type').textContent=item.type==='phrase'?'フレーズ':'単語';
+  document.getElementById('today-main').textContent=item.main;
+  let subText=item.sub;
+  if(item.pron)subText=item.pron+'　'+subText;
+  document.getElementById('today-sub').textContent=subText;
+  document.getElementById('today-example').textContent=item.example?'"'+item.example+'"':'';
+  todayFlipped=false;
+  document.getElementById('today-back').classList.add('hidden');
+  document.getElementById('today-hint').textContent='タップして意味を表示';
+  document.getElementById('today-card').classList.remove('hidden');
+}
+function flipTodayCard(){
+  todayFlipped=!todayFlipped;
+  document.getElementById('today-back').classList.toggle('hidden',!todayFlipped);
+  document.getElementById('today-hint').textContent=todayFlipped?'タップして閉じる':'タップして意味を表示';
 }
 function loadSavedData(){
   gistLoad().then(data=>{if(!data||!data.current)return;renderResult(data.current.script,data.current.phrases||[]);});
